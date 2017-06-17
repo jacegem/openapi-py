@@ -230,7 +230,7 @@ class Kiwoom(QAxWidget):
             self.opw00001Data = deposit
 
         elif requestName == "계좌평가잔고내역요청":
-            OPW00018()
+            OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
         try:
             self.requestLoop.exit()
         except AttributeError:
