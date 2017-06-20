@@ -16,6 +16,8 @@ from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
 from Event.OPW00018 import OPW00018
+from Event.OPT10079 import OPT10079
+from Event.OPT10081 import OPT10081
 
 
 class Kiwoom(QAxWidget):
@@ -178,51 +180,10 @@ class Kiwoom(QAxWidget):
                 print(data)
             """
         elif requestName == "주식틱차트조회요청":
-            # getCommDataEx로 한번에 받아오는 방법
-            data = self.getCommDataEx(trCode, "주식틱차트조회")
-
-            colName = ['현재가', '거래량', '체결시간', '시가', '고가', '저가',
-                       '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-
-            self.data = DataFrame(data, columns=colName)
-
-            print(type(self.data))
-            print(self.data.head(5))
-
-            """ commGetData
-            cnt = self.getRepeatCnt(trCode, requestName)
-
-            for i in range(cnt):
-                date = self.commGetData(trCode, "", requestName, i, "일자")
-                open = self.commGetData(trCode, "", requestName, i, "시가")
-                high = self.commGetData(trCode, "", requestName, i, "고가")
-                low = self.commGetData(trCode, "", requestName, i, "저가")
-                close = self.commGetData(trCode, "", requestName, i, "현재가")
-                print(date, ": ", open, ' ', high, ' ', low, ' ', close)
-            """
+            OPT10079.receiveTrData(screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
 
         elif requestName == "주식일봉차트조회요청":
-            data = self.getCommDataEx(trCode, "주식일봉차트조회")
-
-            colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가',
-                       '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-
-            data = DataFrame(data, columns=colName)
-
-            print(type(data))
-            print(data.head(5))
-
-            """ commGetData
-            cnt = self.getRepeatCnt(trCode, requestName)
-
-            for i in range(cnt):
-                date = self.commGetData(trCode, "", requestName, i, "일자")
-                open = self.commGetData(trCode, "", requestName, i, "시가")
-                high = self.commGetData(trCode, "", requestName, i, "고가")
-                low = self.commGetData(trCode, "", requestName, i, "저가")
-                close = self.commGetData(trCode, "", requestName, i, "현재가")
-                print(date, ": ", open, ' ', high, ' ', low, ' ', close)
-            """
+            OPT10081.receiveTrData(screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
 
         elif requestName == "예수금상세현황요청":
             deposit = self.commGetData(trCode, "", requestName, 0, "d+2추정예수금")
@@ -984,12 +945,12 @@ class KiwoomProcessingError(Exception):
 
     def __init__(self, msg="처리 실패"):
         self.msg = msg
-
     def __str__(self):
         return self.msg
 
     def __repr__(self):
         return self.msg
+
 
 
 class KiwoomConnectError(Exception):
