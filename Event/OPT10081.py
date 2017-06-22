@@ -1,3 +1,4 @@
+# -*- encoding:utf8 -*-
 '''
 주식 틱차트 조회 요청
 '''
@@ -8,7 +9,7 @@ class OPT10081():
         colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가',
                    '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
 
-        data = DataFrame(data, columns=colName)
+        self.data = DataFrame(data, columns=colName)
 
         print(type(data))
         print(data.head(5))

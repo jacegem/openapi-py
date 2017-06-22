@@ -1,7 +1,8 @@
 '''
 주식 틱차트 조회 요청
 '''
-class OPT10079():
+
+class OPT10079:
     def receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4):
         # getCommDataEx로 한번에 받아오는 방법
         data = self.getCommDataEx(trCode, "주식틱차트조회")

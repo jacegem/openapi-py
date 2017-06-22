@@ -1,3 +1,4 @@
+# -*- encoding:utf8 -*-
 class OPW00018():
     def receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,
                       deprecated1, deprecated2, deprecated3, deprecated4):
