@@ -16,10 +16,9 @@ from pandas import DataFrame
 from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
-from Event.OPW00018 import OPW00018
-from Event.OPT10079 import OPT10079
-from Event.OPT10081 import OPT10081
-
+#from Event.OPW00018 import OPW00018
+#from Event.OPT10079 import OPT10079
+#from Event.OPT10081 import OPT10081
 
 class Kiwoom(QAxWidget):
 
@@ -188,9 +187,9 @@ class Kiwoom(QAxWidget):
 
         elif requestName == "주식일봉차트조회요청":
             #OPT10081.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
-            data = self.getCommDataEx(trCode, "주식일봉차트조회")
-            colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-            self.data = DataFrame(data, columns=colName)
+            self.data = self.getCommDataEx(trCode, "주식일봉차트조회")
+            #colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
+            #self.data = DataFrame(data, columns=colName)
 
         elif requestName == "예수금상세현황요청":
             deposit = self.commGetData(trCode, "", requestName, 0, "d+2추정예수금")
