@@ -38,12 +38,16 @@ if __name__ == '__main__':
 
         # opt10081
         for stock in stock_list:
+            print(stock)
+            curs.execute("select * from opt10081 where 종목코드=%s and 일자=%s", (stock, '20170217'))
+            if curs.fetchall():
+                continue
             kiwoom.setInputValue("종목코드", stock)
             kiwoom.setInputValue("기준일자", '20170217')
             kiwoom.setInputValue("수정주가구분", '0')
             kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 0, "0615")
             for cnt in kiwoom.data:
-                curs.execute("""insert into opt10081
+                curs.execute("""replace into opt10081
                               (종목코드, 현재가, 거래량, 거래대금, 일자,
                               시가, 고가, 저가, 수정주가구분, 수정비율,
                               대업종구분, 소업종구분, 종목정보, 수정주가이벤트, 전일종가) values
@@ -61,7 +65,7 @@ if __name__ == '__main__':
                 kiwoom.setInputValue("수정주가구분", '0')
                 kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 2, "0615")
                 for cnt in kiwoom.data:
-                    curs.execute("""insert into opt10081
+                    curs.execute("""replace into opt10081
                                   (종목코드, 현재가, 거래량, 거래대금, 일자,
                                   시가, 고가, 저가, 수정주가구분, 수정비율,
                                   대업종구분, 소업종구분, 종목정보, 수정주가이벤트, 전일종가) values
