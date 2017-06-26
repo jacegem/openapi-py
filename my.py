@@ -9,7 +9,7 @@ import MySQLdb
 import datetime
 
 ACTION = ["주식일봉차트조회요청"]
-TODAY = '20170217'
+TODAY = '20170626'
 if __name__ == '__main__':
     print("START")
     app = QApplication(sys.argv)
@@ -19,7 +19,7 @@ if __name__ == '__main__':
         kiwoom.commConnect()
         # 코스피 종목리스트 가져오기
         stock_list = kiwoom.getCodeList("0")
-        print(stock_list)
+        print(len(stock_list))
         # DB 접속
         conn = MySQLdb.connect(host='localhost', user='pyadmin', password='password', db='pystock', charset='utf8')
         curs = conn.cursor()
@@ -84,12 +84,11 @@ if __name__ == '__main__':
                                             cnt[10], cnt[11], cnt[12], cnt[13]))
                     time.sleep(0.5)
                 conn.commit()
-
         if "주식일봉차트조회요청" in ACTION:
             # opt10081
             for stock in stock_list:
                 print(stock)
-                curs.execute("select * from opt10081 where 종목코드=%s and 일자=%s", (stock, TODAY))
+                curs.execute("select 일자 from opt10081 where 종목코드=%s and 일자=%s", (stock, TODAY))
                 if curs.fetchall():
                     continue
                 kiwoom.setInputValue("종목코드", stock)
