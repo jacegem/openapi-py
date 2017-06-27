@@ -10,6 +10,7 @@ import datetime
 
 ACTION = ["주식일봉차트조회요청"]
 TODAY = '20170626'
+TARGET = ["코스피"]
 if __name__ == '__main__':
     print("START")
     app = QApplication(sys.argv)
@@ -18,7 +19,16 @@ if __name__ == '__main__':
         kiwoom = Kiwoom()
         kiwoom.commConnect()
         # 코스피 종목리스트 가져오기
-        stock_list = kiwoom.getCodeList("0")
+        if '코스피' in TARGET:
+            stock_list = kiwoom.getCodeList("0")[:-1]
+        elif '코스닥' in TARGET:
+            stock_list = kiwoom.getCodeList("10")[:-1]
+        elif '코스피,코스닥' in TARGET:
+            stock_list = kiwoom.getCodeList("0")[:-1] + kiwoom.getCodeList("10")[:-1]
+        else:
+            sys.exit(app.exec_())
+
+        print(stock_list)
         print(len(stock_list))
         # DB 접속
         conn = MySQLdb.connect(host='localhost', user='pyadmin', password='password', db='pystock', charset='utf8')
