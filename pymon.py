@@ -4,7 +4,10 @@
 
 import sys
 import Kiwoom
-from PyQt5.QtWidgets import *
+# from PyQt5.QtWidgets import *
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+from PyQt4.QAxContainer import *
 import pandas as pd
 import datetime
 import time

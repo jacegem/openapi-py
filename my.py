@@ -1,3 +1,4 @@
+# -*- encoding:utf8 -*-
 """
 작성중인..호출 프로그램
 """
@@ -9,8 +10,8 @@ import MySQLdb
 import datetime
 
 ACTION = ["주식일봉차트조회요청"]
-TODAY = '20170626'
-TARGET = ["코스피"]
+TODAY = '20170819'
+TARGET = ["코스피,코스닥"]
 if __name__ == '__main__':
     print("START")
     app = QApplication(sys.argv)
@@ -31,9 +32,9 @@ if __name__ == '__main__':
         print(stock_list)
         print(len(stock_list))
         # DB 접속
-        conn = MySQLdb.connect(host='localhost', user='pyadmin', password='password', db='pystock', charset='utf8')
+        conn = MySQLdb.connect(host='localhost', user='pyadmin', password='password', db='pystock', charset='utf-8')
         curs = conn.cursor()
-        if "주식기본정보요청" in ACTION: #opt10001
+        if "주식기본정보요청" in ACTION:  # opt10001
             for stock in stock_list:
                 print(stock)
                 kiwoom.setInputValue("종목코드", stock)
@@ -50,9 +51,9 @@ if __name__ == '__main__':
                                         cnt[5], cnt[6], cnt[7], cnt[8], cnt[9],
                                         cnt[10], cnt[11], cnt[12], cnt[13]))
                 time.sleep(0.5)
-        if "업종별투자자순매수요청" in ACTION: #opt10051
+        if "업종별투자자순매수요청" in ACTION:  # opt10051
             pass
-        if "업종별주가요청" in ACTION: #OPT20002
+        if "업종별주가요청" in ACTION:  # OPT20002
             pass
         if "주식틱차트조회요청" in ACTION:
             for stock in stock_list:
