@@ -1,4 +1,3 @@
-# -*- encoding:utf8 -*-
 class ReturnCode(object):
     """ 키움 OpenApi+ 함수들이 반환하는 값 """
 

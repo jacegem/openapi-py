@@ -1,4 +1,3 @@
-# -*- encoding:utf8 -*-
 class FidList(object):
     """ receiveChejanData() 이벤트 메서드로 전달되는 FID 목록 """
 
