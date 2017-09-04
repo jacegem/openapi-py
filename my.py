@@ -1,12 +1,13 @@
+# coding=utf-8
 """
 작성중인..호출 프로그램
 """
 
-import sys, time
+import time
 from Kiwoom import *
-from PyQt5.QtWidgets import QApplication
+from PyQt4.QtGui import QApplication
 import MySQLdb
-import datetime
+# import datetime
 
 ACTION = ["주식일봉차트조회요청"]
 TODAY = '20170626'
@@ -33,7 +34,7 @@ if __name__ == '__main__':
         # DB 접속
         conn = MySQLdb.connect(host='localhost', user='pyadmin', password='password', db='pystock', charset='utf8')
         curs = conn.cursor()
-        if "주식기본정보요청" in ACTION: #opt10001
+        if "주식기본정보요청" in ACTION:  # opt10001
             for stock in stock_list:
                 print(stock)
                 kiwoom.setInputValue("종목코드", stock)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
                 time.sleep(0.5)
         if "업종별투자자순매수요청" in ACTION: #opt10051
             pass
-        if "업종별주가요청" in ACTION: #OPT20002
+        if "업종별주가요청" in ACTION:  # OPT20002
             pass
         if "주식틱차트조회요청" in ACTION:
             for stock in stock_list:
@@ -138,8 +139,6 @@ if __name__ == '__main__':
 
     except Exception as e:
         print(e)
-    finally:
-        conn.close()
 
     print("END")
 

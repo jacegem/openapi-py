@@ -7,23 +7,22 @@ Kiwoom 기본 클래스
 import sys
 import logging
 import logging.config
-from PyQt5.QAxContainer import QAxWidget
-from PyQt5.QtCore import QEventLoop
-from PyQt5.QtWidgets import QApplication
+from PyQt4.QAxContainer import QAxWidget
+from PyQt4.QtCore import *
+from PyQt4.QtGui import QApplication
+
 from pandas import DataFrame
 
 # 내부 Class 부분
 from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
-#from Event.OPW00018 import OPW00018
-#from Event.OPT10079 import OPT10079
-#from Event.OPT10081 import OPT10081
+
 
 class Kiwoom(QAxWidget):
 
     def __init__(self):
-        super().__init__()
+        super(Kiwoom, self).__init__()
 
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
 
@@ -62,14 +61,22 @@ class Kiwoom(QAxWidget):
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
 
         # signal & slot
-        self.OnEventConnect.connect(self.eventConnect)
-        self.OnReceiveTrData.connect(self.receiveTrData)
-        self.OnReceiveChejanData.connect(self.receiveChejanData)
+        # self.OnEventConnect.connect(self.eventConnect)
+        # self.OnReceiveTrData.connect(self.receiveTrData)
+        # self.OnReceiveChejanData.connect(self.receiveChejanData)
         self.OnReceiveRealData.connect(self.receiveRealData)
         self.OnReceiveMsg.connect(self.receiveMsg)
         self.OnReceiveConditionVer.connect(self.receiveConditionVer)
         self.OnReceiveTrCondition.connect(self.receiveTrCondition)
         self.OnReceiveRealCondition.connect(self.receiveRealCondition)
+
+        self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
+        self.connect(self, SIGNAL("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self.receiveTrData)
+        self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
+
+        # def eventConnect(self, returnCode):
+        # def receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4):
+        # def receiveRealData(self, code, realType, realData):
 
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
@@ -105,7 +112,7 @@ class Kiwoom(QAxWidget):
 
                 self.server = self.getLoginInfo("GetServerGubun", True)
 
-                if len(self.server) == 0 or self.server != "1":
+                if (self.server is None) and self.server != "1":
                     self.msg += "실서버 연결 성공" + "\r\n\r\n"
 
                 else:
@@ -623,7 +630,8 @@ class Kiwoom(QAxWidget):
                 return
 
             self.condition = self.getConditionNameList()
-            print("조건식 개수: ", len(self.condition))
+            print("조건식 개수: ",
+                  (self.condition))
 
             for key in self.condition.keys():
                 print("조건식: ", key, ": ", self.condition[key])
@@ -982,13 +990,13 @@ if __name__ == "__main__":
         server = kiwoom.getServerGubun()
         print("server: ", server)
         print("type: ", type(server))
-        print("len: ", len(server))
+        #print("len: ", len(server))
 
-        if len(server) == 0 or server != "1":
-            print("실서버 입니다.")
-
-        else:
-            print("모의투자 서버입니다.")
+        # if len(server) == 0 or server != "1":
+        #     print("실서버 입니다.")
+        #
+        # else:
+        #     print("모의투자 서버입니다.")
 
     except Exception as e:
         print(e)

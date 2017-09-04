@@ -1,12 +1,14 @@
+# coding:utf-8
 """
 QtDesigner로 만든 UI와 해당 UI의 위젯에서 발생하는 이벤트를 컨트롤하는 클래스
 """
 
 
 import sys, time
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem
-from PyQt5.QtCore import Qt, QTimer, QTime
-from PyQt5 import uic
+# from PyQt4.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem
+# from PyQt4.QtCore import Qt, QTimer, QTime
+from PyQt4.QtGui import QMainWindow, QApplication
+from PyQt4 import uic
 from Kiwoom import Kiwoom, ParameterTypeError, ParameterValueError, KiwoomProcessingError, KiwoomConnectError
 
 
@@ -15,7 +17,7 @@ ui = uic.loadUiType("pytrader.ui")[0]
 class MyWindow(QMainWindow, ui):
 
     def __init__(self):
-        super().__init__()
+        super(MyWindow, self).__init__()
         self.setupUi(self)
         self.show()
 
@@ -24,7 +26,7 @@ class MyWindow(QMainWindow, ui):
 
         self.server = self.kiwoom.getLoginInfo("GetServerGubun")
 
-        if len(self.server) == 0 or self.server != "1":
+        if self.server is None or self.server != "1":
             self.serverGubun = "실제운영"
         else:
             self.serverGubun = "모의투자"
