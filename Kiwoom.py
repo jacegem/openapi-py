@@ -4,7 +4,7 @@ Kiwoom 기본 클래스
 
 """
 
-import sys
+import sys, time
 import logging
 import logging.config
 from PyQt4.QAxContainer import QAxWidget
@@ -20,7 +20,6 @@ from Code.RealType import RealType
 
 
 class Kiwoom(QAxWidget):
-
     def __init__(self):
         super(Kiwoom, self).__init__()
 
@@ -64,19 +63,20 @@ class Kiwoom(QAxWidget):
         # self.OnEventConnect.connect(self.eventConnect)
         # self.OnReceiveTrData.connect(self.receiveTrData)
         # self.OnReceiveChejanData.connect(self.receiveChejanData)
-        self.OnReceiveRealData.connect(self.receiveRealData)
-        self.OnReceiveMsg.connect(self.receiveMsg)
-        self.OnReceiveConditionVer.connect(self.receiveConditionVer)
-        self.OnReceiveTrCondition.connect(self.receiveTrCondition)
-        self.OnReceiveRealCondition.connect(self.receiveRealCondition)
+        # self.OnReceiveRealData.connect(self.receiveRealData)
+        # self.OnReceiveMsg.connect(self.receiveMsg)
+        # self.OnReceiveConditionVer.connect(self.receiveConditionVer)
+        # self.OnReceiveTrCondition.connect(self.receiveTrCondition)
+        # self.OnReceiveRealCondition.connect(self.receiveRealCondition)
 
         self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
         self.connect(self, SIGNAL("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self.receiveTrData)
         self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
-
-        # def eventConnect(self, returnCode):
-        # def receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4):
-        # def receiveRealData(self, code, realType, realData):
+        self.connect(self, SIGNAL("OnReceiveRealData.connect(QString, QString, QString)"), self.receiveRealData)
+        self.connect(self, SIGNAL("OnReceiveMsg.connect(QString, QString, QString, QString)"), self.receiveMsg)
+        self.connect(self, SIGNAL("OnReceiveConditionVer.connect(int, QString)"), self.receiveConditionVer)
+        self.connect(self, SIGNAL("OnReceiveTrCondition.connect(QString, QString, QString, int, int)"), self.receiveTrCondition)
+        self.connect(self, SIGNAL("OnReceiveRealCondition.connect(QString, QString, QString, QString)"), self.receiveRealCondition)
 
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
@@ -187,16 +187,16 @@ class Kiwoom(QAxWidget):
                 print(data)
             """
         elif requestName == "주식틱차트조회요청":
-            #OPT10079.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
+            # OPT10079.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
             self.data = self.getCommDataEx(trCode, "주식틱차트조회")
-            #colName = ['현재가', '거래량', '체결시간', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-            #self.data = DataFrame(data, columns=colName)
+            # colName = ['현재가', '거래량', '체결시간', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
+            # self.data = DataFrame(data, columns=colName)
 
         elif requestName == "주식일봉차트조회요청":
-            #OPT10081.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
+            # OPT10081.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
             self.data = self.getCommDataEx(trCode, "주식일봉차트조회")
-            #colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-            #self.data = DataFrame(data, columns=colName)
+            # colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
+            # self.data = DataFrame(data, columns=colName)
 
         elif requestName == "예수금상세현황요청":
             deposit = self.commGetData(trCode, "", requestName, 0, "d+2추정예수금")
@@ -204,7 +204,8 @@ class Kiwoom(QAxWidget):
             self.opw00001Data = deposit
 
         elif requestName == "계좌평가잔고내역요청":
-            OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
+            OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2,
+                                   deprecated3, deprecated4)
         try:
             self.requestLoop.exit()
         except AttributeError:
@@ -379,10 +380,10 @@ class Kiwoom(QAxWidget):
                 and isinstance(trCode, str)
                 and isinstance(inquiry, int)
                 and isinstance(screenNo, str)):
-
             raise ParameterTypeError()
 
-        returnCode = self.dynamicCall("CommRqData(QString, QString, int, QString)", requestName, trCode, inquiry, screenNo)
+        returnCode = self.dynamicCall("CommRqData(QString, QString, int, QString)", requestName, trCode, inquiry,
+                                      screenNo)
 
         if returnCode != ReturnCode.OP_ERR_NONE:
             raise KiwoomProcessingError("commRqData(): " + ReturnCode.CAUSE[returnCode])
@@ -511,7 +512,6 @@ class Kiwoom(QAxWidget):
                 and isinstance(requestName, str)
                 and isinstance(screenNo, str)
                 and isinstance(typeFlag, int)):
-
             raise ParameterTypeError()
 
         returnCode = self.dynamicCall("CommKwRqData(QString, QBoolean, int, int, QString, QString)",
@@ -820,11 +820,11 @@ class Kiwoom(QAxWidget):
                 and isinstance(price, int)
                 and isinstance(hogaType, str)
                 and isinstance(originOrderNo, str)):
-
             raise ParameterTypeError()
 
         returnCode = self.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      [requestName, screenNo, accountNo, orderType, code, qty, price, hogaType, originOrderNo])
+                                      [requestName, screenNo, accountNo, orderType, code, qty, price, hogaType,
+                                       originOrderNo])
 
         if returnCode != ReturnCode.OP_ERR_NONE:
             raise KiwoomProcessingError("sendOrder(): " + ReturnCode.CAUSE[returnCode])
@@ -876,7 +876,9 @@ class Kiwoom(QAxWidget):
 
         cmd = 'GetCodeListByMarket("%s")' % market
         codeList = self.dynamicCall(cmd)
-        return codeList.split(';')
+        ret = codeList.split(';')
+        return ret
+
 
     def getCodeList(self, *market):
         """
@@ -959,12 +961,12 @@ class KiwoomProcessingError(Exception):
 
     def __init__(self, msg="처리 실패"):
         self.msg = msg
+
     def __str__(self):
         return self.msg
 
     def __repr__(self):
         return self.msg
-
 
 
 class KiwoomConnectError(Exception):
