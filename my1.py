@@ -105,7 +105,7 @@ if __name__ == '__main__':
             # opt10081
             for stock in stock_list:
                 print(stock)
-                curs.execute("select 일자 from opt10081 where 종목코드=%s and 일자=%s", (stock, TODAY))
+                curs.execute("select date from opt10081 where symbol=%s and date=%s", (stock, TODAY))
                 if curs.fetchall():
                     continue
                 kiwoom.setInputValue("종목코드", stock)
@@ -114,9 +114,9 @@ if __name__ == '__main__':
                 kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 0, "0615")
                 for cnt in kiwoom.data:
                     curs.execute("""replace into opt10081
-                                  (종목코드, 현재가, 거래량, 거래대금, 일자,
-                                  시가, 고가, 저가, 수정주가구분, 수정비율,
-                                  대업종구분, 소업종구분, 종목정보, 수정주가이벤트, 전일종가) values
+                              (symbol, close, volume, volume_price, date,
+                              open, high, low, modify_gubun, modify_ratio,
+                              big_gubun, small_gubun, symbol_inform, modify_event, before_close) values
                                   (%s, %s, %s, %s, %s,
                                    %s, %s, %s, %s, %s,
                                    %s, %s, %s, %s, %s)
@@ -131,9 +131,9 @@ if __name__ == '__main__':
                     kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 2, "0615")
                     for cnt in kiwoom.data:
                         curs.execute("""replace into opt10081
-                                      (종목코드, 현재가, 거래량, 거래대금, 일자,
-                                      시가, 고가, 저가, 수정주가구분, 수정비율,
-                                      대업종구분, 소업종구분, 종목정보, 수정주가이벤트, 전일종가) values
+                                  (symbol, close, volume, volume_price, date,
+                                  open, high, low, modify_gubun, modify_ratio,
+                                  big_gubun, small_gubun, symbol_inform, modify_event, before_close) values
                                       (%s, %s, %s, %s, %s,
                                        %s, %s, %s, %s, %s,
                                        %s, %s, %s, %s, %s)
