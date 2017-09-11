@@ -1,19 +1,30 @@
-# -*- encoding:utf8 -*-
+# -*- encoding:utf-8 -*-
 """
 Kiwoom 기본 클래스
-
 """
 
 import sys, time
 import logging
 import logging.config
-from PyQt4.QAxContainer import QAxWidget
-from PyQt4.QtCore import *
-from PyQt4.QtGui import QApplication
-
 from pandas import DataFrame
 
-# 내부 Class 부분
+'''
+PYTHON 2
+'''
+# from PyQt4.QAxContainer import QAxWidget
+# from PyQt4.QtCore import *
+# from PyQt4.QtGui import QApplication
+# # 내부 Class 부분
+# from Code.ReturnCode import ReturnCode
+# from Code.FidList import FidList
+# from Code.RealType import RealType
+
+'''
+PYTHON 3
+'''
+from PyQt5.QAxContainer import QAxWidget
+from PyQt5.QtCore import QEventLoop
+from PyQt5.QtWidgets import QApplication
 from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
@@ -58,25 +69,29 @@ class Kiwoom(QAxWidget):
 
         # 보유종목 정보
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
+        # Python2#
+        # self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
+        # self.connect(self, SIGNAL(
+        #     "OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"),
+        #              self.receiveTrData)
+        # self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
+        # self.connect(self, SIGNAL("OnReceiveRealData.connect(QString, QString, QString)"), self.receiveRealData)
+        # self.connect(self, SIGNAL("OnReceiveMsg.connect(QString, QString, QString, QString)"), self.receiveMsg)
+        # self.connect(self, SIGNAL("OnReceiveConditionVer.connect(int, QString)"), self.receiveConditionVer)
+        # self.connect(self, SIGNAL("OnReceiveTrCondition.connect(QString, QString, QString, int, int)"),
+        #              self.receiveTrCondition)
+        # self.connect(self, SIGNAL("OnReceiveRealCondition.connect(QString, QString, QString, QString)"),
+        #              self.receiveRealCondition)
 
-        # signal & slot
-        # self.OnEventConnect.connect(self.eventConnect)
-        # self.OnReceiveTrData.connect(self.receiveTrData)
-        # self.OnReceiveChejanData.connect(self.receiveChejanData)
-        # self.OnReceiveRealData.connect(self.receiveRealData)
-        # self.OnReceiveMsg.connect(self.receiveMsg)
-        # self.OnReceiveConditionVer.connect(self.receiveConditionVer)
-        # self.OnReceiveTrCondition.connect(self.receiveTrCondition)
-        # self.OnReceiveRealCondition.connect(self.receiveRealCondition)
-
-        self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
-        self.connect(self, SIGNAL("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self.receiveTrData)
-        self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
-        self.connect(self, SIGNAL("OnReceiveRealData.connect(QString, QString, QString)"), self.receiveRealData)
-        self.connect(self, SIGNAL("OnReceiveMsg.connect(QString, QString, QString, QString)"), self.receiveMsg)
-        self.connect(self, SIGNAL("OnReceiveConditionVer.connect(int, QString)"), self.receiveConditionVer)
-        self.connect(self, SIGNAL("OnReceiveTrCondition.connect(QString, QString, QString, int, int)"), self.receiveTrCondition)
-        self.connect(self, SIGNAL("OnReceiveRealCondition.connect(QString, QString, QString, QString)"), self.receiveRealCondition)
+        # Python3
+        self.OnEventConnect.connect(self.eventConnect)
+        self.OnReceiveTrData.connect(self.receiveTrData)
+        self.OnReceiveChejanData.connect(self.receiveChejanData)
+        self.OnReceiveRealData.connect(self.receiveRealData)
+        self.OnReceiveMsg.connect(self.receiveMsg)
+        self.OnReceiveConditionVer.connect(self.receiveConditionVer)
+        self.OnReceiveTrCondition.connect(self.receiveTrCondition)
+        self.OnReceiveRealCondition.connect(self.receiveRealCondition)
 
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
@@ -879,7 +894,6 @@ class Kiwoom(QAxWidget):
         ret = codeList.split(';')
         return ret
 
-
     def getCodeList(self, *market):
         """
         여러 시장의 종목코드를 List 형태로 반환하는 헬퍼 메서드.
@@ -979,7 +993,6 @@ class KiwoomConnectError(Exception):
         return self.msg
 
 
-
 if __name__ == "__main__":
     """ 조건검색 테스트 코드 """
 
@@ -992,7 +1005,7 @@ if __name__ == "__main__":
         server = kiwoom.getServerGubun()
         print("server: ", server)
         print("type: ", type(server))
-        #print("len: ", len(server))
+        # print("len: ", len(server))
 
         # if len(server) == 0 or server != "1":
         #     print("실서버 입니다.")
