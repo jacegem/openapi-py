@@ -10,9 +10,9 @@ import MySQLdb
 # import datetime
 
 '''Python2'''
-#from PyQt4.QtGui import QApplication
+from PyQt4.QtGui import QApplication
 '''Python3'''
-from PyQt5.QtWidgets import QApplication
+#from PyQt5.QtWidgets import QApplication
 
 
 ACTION = ["주식일봉차트조회요청"]

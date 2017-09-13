@@ -11,23 +11,23 @@ from pandas import DataFrame
 '''
 PYTHON 2
 '''
-# from PyQt4.QAxContainer import QAxWidget
-# from PyQt4.QtCore import *
-# from PyQt4.QtGui import QApplication
-# # 내부 Class 부분
-# from Code.ReturnCode import ReturnCode
-# from Code.FidList import FidList
-# from Code.RealType import RealType
+from PyQt4.QAxContainer import QAxWidget
+from PyQt4.QtCore import *
+from PyQt4.QtGui import QApplication
+# 내부 Class 부분
+from Code.ReturnCode import ReturnCode
+from Code.FidList import FidList
+from Code.RealType import RealType
 
 '''
 PYTHON 3
 '''
-from PyQt5.QAxContainer import QAxWidget
-from PyQt5.QtCore import QEventLoop
-from PyQt5.QtWidgets import QApplication
-from Code.ReturnCode import ReturnCode
-from Code.FidList import FidList
-from Code.RealType import RealType
+# from PyQt5.QAxContainer import QAxWidget
+# from PyQt5.QtCore import QEventLoop
+# from PyQt5.QtWidgets import QApplication
+# from Code.ReturnCode import ReturnCode
+# from Code.FidList import FidList
+# from Code.RealType import RealType
 
 
 class Kiwoom(QAxWidget):
@@ -69,29 +69,29 @@ class Kiwoom(QAxWidget):
 
         # 보유종목 정보
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
-        # Python2#
-        # self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
-        # self.connect(self, SIGNAL(
-        #     "OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"),
-        #              self.receiveTrData)
-        # self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
-        # self.connect(self, SIGNAL("OnReceiveRealData.connect(QString, QString, QString)"), self.receiveRealData)
-        # self.connect(self, SIGNAL("OnReceiveMsg.connect(QString, QString, QString, QString)"), self.receiveMsg)
-        # self.connect(self, SIGNAL("OnReceiveConditionVer.connect(int, QString)"), self.receiveConditionVer)
-        # self.connect(self, SIGNAL("OnReceiveTrCondition.connect(QString, QString, QString, int, int)"),
-        #              self.receiveTrCondition)
-        # self.connect(self, SIGNAL("OnReceiveRealCondition.connect(QString, QString, QString, QString)"),
-        #              self.receiveRealCondition)
+        '''Python2'''
+        self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
+        self.connect(self, SIGNAL(
+            "OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"),
+                     self.receiveTrData)
+        self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
+        self.connect(self, SIGNAL("OnReceiveRealData.connect(QString, QString, QString)"), self.receiveRealData)
+        self.connect(self, SIGNAL("OnReceiveMsg.connect(QString, QString, QString, QString)"), self.receiveMsg)
+        self.connect(self, SIGNAL("OnReceiveConditionVer.connect(int, QString)"), self.receiveConditionVer)
+        self.connect(self, SIGNAL("OnReceiveTrCondition.connect(QString, QString, QString, int, int)"),
+                     self.receiveTrCondition)
+        self.connect(self, SIGNAL("OnReceiveRealCondition.connect(QString, QString, QString, QString)"),
+                     self.receiveRealCondition)
 
-        # Python3
-        self.OnEventConnect.connect(self.eventConnect)
-        self.OnReceiveTrData.connect(self.receiveTrData)
-        self.OnReceiveChejanData.connect(self.receiveChejanData)
-        self.OnReceiveRealData.connect(self.receiveRealData)
-        self.OnReceiveMsg.connect(self.receiveMsg)
-        self.OnReceiveConditionVer.connect(self.receiveConditionVer)
-        self.OnReceiveTrCondition.connect(self.receiveTrCondition)
-        self.OnReceiveRealCondition.connect(self.receiveRealCondition)
+        '''Python3'''
+        # self.OnEventConnect.connect(self.eventConnect)
+        # self.OnReceiveTrData.connect(self.receiveTrData)
+        # self.OnReceiveChejanData.connect(self.receiveChejanData)
+        # self.OnReceiveRealData.connect(self.receiveRealData)
+        # self.OnReceiveMsg.connect(self.receiveMsg)
+        # self.OnReceiveConditionVer.connect(self.receiveConditionVer)
+        # self.OnReceiveTrCondition.connect(self.receiveTrCondition)
+        # self.OnReceiveRealCondition.connect(self.receiveRealCondition)
 
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
