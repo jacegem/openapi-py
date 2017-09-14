@@ -25,7 +25,6 @@ from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
 
-
 class Kiwoom(QAxWidget):
     def __init__(self):
         super().__init__()
@@ -215,8 +214,42 @@ class Kiwoom(QAxWidget):
             self.opw00001Data = deposit
 
         elif requestName == "계좌평가잔고내역요청":
-            OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2,
-                                   deprecated3, deprecated4)
+            # OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4)
+            # 계좌 평가 정보
+            accountEvaluation = []
+            keyList = ["총매입금액", "총평가금액", "총평가손익금액", "총수익률(%)", "추정예탁자산"]
+
+            for key in keyList:
+                value = self.commGetData(trCode, "", requestName, 0, key)
+
+                # if key.startswith("총수익률"):
+                #     value = self.changeFormat(value, 1)
+                # else:
+                #     value = self.changeFormat(value)
+
+                accountEvaluation.append(value)
+
+            self.opw00018Data['accountEvaluation'] = accountEvaluation
+
+            # 보유 종목 정보
+            cnt = self.getRepeatCnt(trCode, requestName)
+            keyList = ["종목명", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
+
+            for i in range(cnt):
+                stock = []
+
+                for key in keyList:
+                    value = self.commGetData(trCode, "", requestName, i, key)
+
+                    if key.startswith("수익률"):
+                        value = self.changeFormat(value, 2)
+                    elif key != "종목명":
+                        value = self.changeFormat(value)
+
+                    stock.append(value)
+
+                self.opw00018Data['stocks'].append(stock)
+
         try:
             self.requestLoop.exit()
         except AttributeError:
@@ -234,7 +267,7 @@ class Kiwoom(QAxWidget):
         :param realType: string - 실시간 타입(KOA의 실시간 목록 참조)
         :param realData: string - 실시간 데이터 전문
         """
-
+        print ("REAL DATA")
         try:
             self.log.debug("[receiveRealData]")
             self.log.debug("({})".format(realType))
@@ -1001,13 +1034,12 @@ if __name__ == "__main__":
         server = kiwoom.getServerGubun()
         print("server: ", server)
         print("type: ", type(server))
-        # print("len: ", len(server))
 
-        # if len(server) == 0 or server != "1":
-        #     print("실서버 입니다.")
-        #
-        # else:
-        #     print("모의투자 서버입니다.")
+        if len(server) == 0 or server != "1":
+            print("실서버 입니다.")
+
+        else:
+            print("모의투자 서버입니다.")
 
     except Exception as e:
         print(e)
