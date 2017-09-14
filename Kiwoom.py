@@ -8,9 +8,7 @@ import logging
 import logging.config
 from pandas import DataFrame
 
-'''
-PYTHON 2
-'''
+'''PYTHON 2'''
 from PyQt4.QAxContainer import QAxWidget
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QApplication
@@ -19,9 +17,7 @@ from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
 
-'''
-PYTHON 3
-'''
+'''PYTHON 3'''
 # from PyQt5.QAxContainer import QAxWidget
 # from PyQt5.QtCore import QEventLoop
 # from PyQt5.QtWidgets import QApplication
