@@ -12,14 +12,16 @@ class ReturnCode(object):
     OP_ERR_MEMORY = -104  # 메모리보호실패
     OP_ERR_INPUT = -105  # 함수입력값오류
     OP_ERR_SOCKET_CLOSED = -106  # 통신연결종료
+
     OP_ERR_SISE_OVERFLOW = -200  # 시세조회과부하
     OP_ERR_RQ_STRUCT_FAIL = -201  # 전문작성초기화실패
     OP_ERR_RQ_STRING_FAIL = -202  # 전문작성입력값오류
     OP_ERR_NO_DATA = -203  # 데이터없음
-    OP_ERR_OVER_MAX_DATA = -204  # 조회가능한종목수초과
+    OP_ERR_OVER_MAX_DATA = -204  # 조회가능한 종목수 초과. 한번에 조회 가능한 종목개수는 최대 100종목.
     OP_ERR_DATA_RCV_FAIL = -205  # 데이터수신실패
-    OP_ERR_OVER_MAX_FID = -206  # 조회가능한FID수초과
+    OP_ERR_OVER_MAX_FID = -206  # 조회가능한FID수초과, 한번에 조회 가능한 FID개수는 최대 100개
     OP_ERR_REAL_CANCEL = -207  # 실시간해제오류
+
     OP_ERR_ORD_WRONG_INPUT = -300  # 입력값오류
     OP_ERR_ORD_WRONG_ACCTNO = -301  # 계좌비밀번호없음
     OP_ERR_OTHER_ACC_USE = -302  # 타인계좌사용오류
@@ -32,6 +34,7 @@ class ReturnCode(object):
     OP_ERR_MIS_300CNT_EXC = -309  # 주문수량300계약초과
     OP_ERR_MIS_500CNT_EXC = -310  # 주문수량500계약초과
     OP_ERR_ORD_WRONG_ACCTINFO = -340  # 계좌정보없음
+
     OP_ERR_ORD_SYMCODE_EMPTY = -500  # 종목코드없음
 
     CAUSE = {

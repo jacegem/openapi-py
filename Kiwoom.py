@@ -8,15 +8,6 @@ import logging
 import logging.config
 from pandas import DataFrame
 
-'''PYTHON 2'''
-# from PyQt4.QAxContainer import QAxWidget
-# from PyQt4.QtCore import *
-# from PyQt4.QtGui import QApplication
-# # 내부 Class 부분
-# from Code.ReturnCode import ReturnCode
-# from Code.FidList import FidList
-# from Code.RealType import RealType
-
 '''PYTHON 3'''
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtCore import QEventLoop
@@ -25,12 +16,26 @@ from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
 
+# void OnReceiveInvestRealData(QString sRealKey);
+# QObject::connect(object, SIGNAL(OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)), receiver, SLOT(someSlot(QString, QString, QString, QString, QString, int, QString, QString, QString)));
+
+# void exception(int code, QString source, QString disc, QString help);
+# QObject::connect(object, SIGNAL(exception(int, QString, QString, QString)), receiver, SLOT(someSlot(int, QString, QString, QString)));
+
+# void propertyChanged(QString name);
+# QObject::connect(object, SIGNAL(propertyChanged(QString)), receiver, SLOT(someSlot(QString)));
+
+# void signal(QString name, int argc, void* argv);
+# QObject::connect(object, SIGNAL(signal(QString, int, void *)), receiver, SLOT(someSlot(QString, int, void *)));
+
+
 class Kiwoom(QAxWidget):
     def __init__(self):
         super().__init__()
 
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
-
+        with open("api.html",'w') as f:
+            f.write(self.generateDocumentation())
         # Loop 변수
         # 비동기 방식으로 동작되는 이벤트를 동기화(순서대로 동작) 시킬 때
         self.loginLoop = None
@@ -65,20 +70,6 @@ class Kiwoom(QAxWidget):
         # 보유종목 정보
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
         self.opw00018Data_copy = {'accountEvaluation': [], 'stocks': []}
-
-        '''Python2'''
-        # self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
-        # self.connect(self, SIGNAL(
-        #     "OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"),
-        #              self.receiveTrData)
-        # self.connect(self, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self.receiveChejanData)
-        # self.connect(self, SIGNAL("OnReceiveRealData.connect(QString, QString, QString)"), self.receiveRealData)
-        # self.connect(self, SIGNAL("OnReceiveMsg.connect(QString, QString, QString, QString)"), self.receiveMsg)
-        # self.connect(self, SIGNAL("OnReceiveConditionVer.connect(int, QString)"), self.receiveConditionVer)
-        # self.connect(self, SIGNAL("OnReceiveTrCondition.connect(QString, QString, QString, int, int)"),
-        #              self.receiveTrCondition)
-        # self.connect(self, SIGNAL("OnReceiveRealCondition.connect(QString, QString, QString, QString)"),
-        #              self.receiveRealCondition)
 
         '''Python3'''
         self.OnEventConnect.connect(self.eventConnect)
@@ -437,6 +428,9 @@ class Kiwoom(QAxWidget):
         # 루프 생성: receiveTrData() 메서드에서 루프를 종료시킨다.
         self.requestLoop = QEventLoop()
         self.requestLoop.exec_()
+
+#QString CommGetData(QString sJongmokCode,  QString sRealType, QString sFieldName, int nIndex, QString sInnerFieldName);
+#QString GetCommData(QString strTrCode,     QString strRecordName, int nIndex, QString strItemName);
 
     def commGetData(self, trCode, realType, requestName, index, key):
         """
