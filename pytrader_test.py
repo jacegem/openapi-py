@@ -189,6 +189,7 @@ class MyWindow(QMainWindow, ui):
         self.stocksTable.resizeRowsToContents()
 
         # 데이터 초기화
+        self.kiwoom.opw00018Data_copy = self.kiwoom.opw00018Data.copy()
         self.kiwoom.opwDataReset()
 
         # inquiryTimer 재시작
@@ -351,8 +352,8 @@ class MyWindow(QMainWindow, ui):
 
         # TODO: 매도전략 작성
         try:
-            # ["종목명", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
-            stockList = self.kiwoom.opw00018Data['stocks']
+            # ["종목명", "종목코드", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
+            stockList = self.kiwoom.opw00018Data_copy['stocks']
 
             if len(stockList) == 0:
                 return []
@@ -360,12 +361,13 @@ class MyWindow(QMainWindow, ui):
             # 매수할 종목 리스트
             codeList = []
 
-            for code in stockList:
-                if (code[5] < -2) or (code[5] > 2):
-                    order = "매도;{};시장가;10;0;매도전".format(code)
+            for (codeName, code, volume, buy, cur, profit, profit_ratio) in stockList:
+                code = code[-6:]
+                if (float(profit_ratio) < -2) or (float(profit_ratio) > 2):
+                    order = "매도;{};시장가;{};0;매도전".format(code, volume)
                     codeList.append(order)
-                    self.todayBuyList.remove(code)
-
+                    self.kiwoom.setRealRemove("0156", code)
+                    #self.todayBuyList.remove(code)
             return codeList
         except Exception as e:
             print(e)

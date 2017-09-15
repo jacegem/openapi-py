@@ -64,6 +64,8 @@ class Kiwoom(QAxWidget):
 
         # 보유종목 정보
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
+        self.opw00018Data_copy = {'accountEvaluation': [], 'stocks': []}
+
         '''Python2'''
         # self.connect(self, SIGNAL("OnEventConnect(int)"), self.eventConnect)
         # self.connect(self, SIGNAL(
@@ -233,7 +235,7 @@ class Kiwoom(QAxWidget):
 
             # 보유 종목 정보
             cnt = self.getRepeatCnt(trCode, requestName)
-            keyList = ["종목명", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
+            keyList = ["종목명", "종목번호", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
 
             for i in range(cnt):
                 stock = []
@@ -243,7 +245,7 @@ class Kiwoom(QAxWidget):
 
                     if key.startswith("수익률"):
                         value = self.changeFormat(value, 2)
-                    elif key != "종목명":
+                    elif key != "종목번호" and key != "종목명":
                         value = self.changeFormat(value)
 
                     stock.append(value)
