@@ -3,7 +3,6 @@
 QtDesigner로 만든 UI와 해당 UI의 위젯에서 발생하는 이벤트를 컨트롤하는 클래스
 """
 
-
 import sys, time
 # from PyQt4.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem
 # from PyQt4.QtCore import Qt, QTimer, QTime
@@ -11,13 +10,12 @@ from PyQt4.QtGui import QMainWindow, QApplication
 from PyQt4 import uic
 from Kiwoom import Kiwoom, ParameterTypeError, ParameterValueError, KiwoomProcessingError, KiwoomConnectError
 
-
 ui = uic.loadUiType("pytrader.ui")[0]
 
-class MyWindow(QMainWindow, ui):
 
+class MyWindow(QMainWindow, ui):
     def __init__(self):
-        super(MyWindow, self).__init__()
+        super().__init__()
         self.setupUi(self)
         self.show()
 
@@ -40,7 +38,7 @@ class MyWindow(QMainWindow, ui):
 
         # 잔고 및 보유종목 조회 타이머
         self.inquiryTimer = QTimer(self)
-        self.inquiryTimer.start(1000*10)
+        self.inquiryTimer.start(1000 * 10)
         self.inquiryTimer.timeout.connect(self.timeout)
 
         self.setAccountComboBox()
@@ -165,12 +163,12 @@ class MyWindow(QMainWindow, ui):
             self.showDialog('Critical', e)
 
         # accountEvaluationTable 테이블에 정보 출력
-        item = QTableWidgetItem(self.kiwoom.opw00001Data)   # d+2추정예수금
+        item = QTableWidgetItem(self.kiwoom.opw00001Data)  # d+2추정예수금
         item.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
         self.accountEvaluationTable.setItem(0, 0, item)
 
         for i in range(1, 6):
-            item = QTableWidgetItem(self.kiwoom.opw00018Data['accountEvaluation'][i-1])
+            item = QTableWidgetItem(self.kiwoom.opw00018Data['accountEvaluation'][i - 1])
             item.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
             self.accountEvaluationTable.setItem(0, i, item)
 
@@ -194,7 +192,7 @@ class MyWindow(QMainWindow, ui):
         self.kiwoom.opwDataReset()
 
         # inquiryTimer 재시작
-        self.inquiryTimer.start(1000*10)
+        self.inquiryTimer.start(1000 * 10)
 
     # 경고창
     def showDialog(self, grade, error):
@@ -274,7 +272,8 @@ class MyWindow(QMainWindow, ui):
 
             try:
                 if stocks[5].rstrip() == '매수전':
-                    self.kiwoom.sendOrder("자동매수주문", "0101", account, 1, code, int(qty), int(price), hogaTypeTable[hoga], "")
+                    self.kiwoom.sendOrder("자동매수주문", "0101", account, 1, code, int(qty), int(price), hogaTypeTable[hoga],
+                                          "")
 
                     # 주문 접수시
                     if self.kiwoom.orderNo:
@@ -287,7 +286,8 @@ class MyWindow(QMainWindow, ui):
 
                 # 참고: 해당 종목을 현재도 보유하고 있다고 가정함.
                 elif stocks[5].rstrip() == '매도전':
-                    self.kiwoom.sendOrder("자동매도주문", "0101", account, 2, code, int(qty), int(price), hogaTypeTable[hoga], "")
+                    self.kiwoom.sendOrder("자동매도주문", "0101", account, 2, code, int(qty), int(price), hogaTypeTable[hoga],
+                                          "")
 
                     # 주문 접수시
                     if self.kiwoom.orderNo:

@@ -7,8 +7,6 @@ import sys, time
 import logging
 import logging.config
 from pandas import DataFrame
-
-'''PYTHON 3'''
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtCore import QEventLoop
 from PyQt5.QtWidgets import QApplication
@@ -16,26 +14,12 @@ from Code.ReturnCode import ReturnCode
 from Code.FidList import FidList
 from Code.RealType import RealType
 
-# void OnReceiveInvestRealData(QString sRealKey);
-# QObject::connect(object, SIGNAL(OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)), receiver, SLOT(someSlot(QString, QString, QString, QString, QString, int, QString, QString, QString)));
-
-# void exception(int code, QString source, QString disc, QString help);
-# QObject::connect(object, SIGNAL(exception(int, QString, QString, QString)), receiver, SLOT(someSlot(int, QString, QString, QString)));
-
-# void propertyChanged(QString name);
-# QObject::connect(object, SIGNAL(propertyChanged(QString)), receiver, SLOT(someSlot(QString)));
-
-# void signal(QString name, int argc, void* argv);
-# QObject::connect(object, SIGNAL(signal(QString, int, void *)), receiver, SLOT(someSlot(QString, int, void *)));
-
 
 class Kiwoom(QAxWidget):
     def __init__(self):
         super().__init__()
-
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
-        with open("api.html",'w') as f:
-            f.write(self.generateDocumentation())
+
         # Loop 변수
         # 비동기 방식으로 동작되는 이벤트를 동기화(순서대로 동작) 시킬 때
         self.loginLoop = None
@@ -69,17 +53,29 @@ class Kiwoom(QAxWidget):
 
         # 보유종목 정보
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
-        self.opw00018Data_copy = {'accountEvaluation': [], 'stocks': []}
 
-        '''Python3'''
+        # signal & slot
         self.OnEventConnect.connect(self.eventConnect)
-        self.OnReceiveTrData.connect(self.receiveTrData)
-        self.OnReceiveChejanData.connect(self.receiveChejanData)
-        self.OnReceiveRealData.connect(self.receiveRealData)
         self.OnReceiveMsg.connect(self.receiveMsg)
+        self.OnReceiveTrData.connect(self.receiveTrData)
         self.OnReceiveConditionVer.connect(self.receiveConditionVer)
         self.OnReceiveTrCondition.connect(self.receiveTrCondition)
+        self.OnReceiveRealData.connect(self.receiveRealData)
+        self.OnReceiveChejanData.connect(self.receiveChejanData)
         self.OnReceiveRealCondition.connect(self.receiveRealCondition)
+
+        # void OnReceiveInvestRealData(QString sRealKey);
+        # QObject::connect(object, SIGNAL(OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)), receiver, SLOT(someSlot(QString, QString, QString, QString, QString, int, QString, QString, QString)));
+        self.OnReceiveInvestRealData.connect(self.receiveInvestRealData)
+
+        # void exception(int code, QString source, QString disc, QString help);
+        # QObject::connect(object, SIGNAL(exception(int, QString, QString, QString)), receiver, SLOT(someSlot(int, QString, QString, QString)));
+
+        # void propertyChanged(QString name);
+        # QObject::connect(object, SIGNAL(propertyChanged(QString)), receiver, SLOT(someSlot(QString)));
+
+        # void signal(QString name, int argc, void* argv);
+        # QObject::connect(object, SIGNAL(signal(QString, int, void *)), receiver, SLOT(someSlot(QString, int, void *)));
 
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
@@ -189,6 +185,7 @@ class Kiwoom(QAxWidget):
                 data = self.commGetData(trCode, "", requestName, i, "종목명")
                 print(data)
             """
+
         elif requestName == "주식틱차트조회요청":
             # OPT10079.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
             self.data = self.getCommDataEx(trCode, "주식틱차트조회")
@@ -248,6 +245,59 @@ class Kiwoom(QAxWidget):
         except AttributeError:
             pass
 
+    def receiveConditionVer(self, receive, msg):
+        """
+        getConditionLoad() 메서드의 조건식 목록 요청에 대한 응답 이벤트
+
+        :param receive: int - 응답결과(1: 성공, 나머지 실패)
+        :param msg: string - 메세지
+        """
+
+        try:
+            if not receive:
+                return
+
+            self.condition = self.getConditionNameList()
+            print("조건식 개수: ", len(self.condition))
+
+            for key in self.condition.keys():
+                print("조건식: ", key, ": ", self.condition[key])
+                print("key type: ", type(key))
+
+        except Exception as e:
+            print(e)
+
+        finally:
+            self.conditionLoop.exit()
+
+    def receiveTrCondition(self, screenNo, codes, conditionName, conditionIndex, inquiry):
+        """
+        (1회성, 실시간) 종목 조건검색 요청시 발생되는 이벤트
+
+        :param screenNo: string
+        :param codes: string - 종목코드 목록(각 종목은 세미콜론으로 구분됨)
+        :param conditionName: string - 조건식 이름
+        :param conditionIndex: int - 조건식 인덱스
+        :param inquiry: int - 조회구분(0: 남은데이터 없음, 2: 남은데이터 있음)
+        """
+
+        print("[receiveTrCondition]")
+
+        try:
+            if codes == "":
+                return
+
+            codeList = codes.split(';')
+            del codeList[-1]
+
+            print(codeList)
+            print("종목개수: ", len(codeList))
+
+            self.realConditionCodeList += codeList
+
+        finally:
+            self.conditionLoop.exit()
+
     def receiveRealData(self, code, realType, realData):
         """
         실시간 데이터 수신 이벤트
@@ -260,7 +310,7 @@ class Kiwoom(QAxWidget):
         :param realType: string - 실시간 타입(KOA의 실시간 목록 참조)
         :param realData: string - 실시간 데이터 전문
         """
-        print ("REAL DATA")
+        print("REAL DATA")
         try:
             self.log.debug("[receiveRealData]")
             self.log.debug("({})".format(realType))
@@ -305,6 +355,27 @@ class Kiwoom(QAxWidget):
         for fid in fids:
             print(FidList.CHEJAN[int(fid)] if int(fid) in FidList.CHEJAN else fid, ": ", self.getChejanData(int(fid)))
         print("========================================")
+
+    def receiveRealCondition(self, code, event, conditionName, conditionIndex):
+        """
+        실시간 종목 조건검색 요청시 발생되는 이벤트
+
+        :param code: string - 종목코드
+        :param event: string - 이벤트종류("I": 종목편입, "D": 종목이탈)
+        :param conditionName: string - 조건식 이름
+        :param conditionIndex: string - 조건식 인덱스(여기서만 인덱스가 string 타입으로 전달됨)
+        """
+
+        print("[receiveRealCondition]")
+
+        print("종목코드: ", code)
+        print("이벤트: ", "종목편입" if event == "I" else "종목이탈")
+
+        if event == "I":
+            self.realConditionCodeList.append(code)
+
+    def receiveInvestRealData(self, sRealKey):
+        print("ON receive invest Real Data")
 
     ###############################################################
     # 메서드 정의: 로그인 관련 메서드                                    #
@@ -363,6 +434,8 @@ class Kiwoom(QAxWidget):
 
         if tag == "GetServerGubun":
             info = self.getServerGubun()
+            print("GET LOGIN INFO : {}".format(info))
+
         else:
             cmd = 'GetLoginInfo("%s")' % tag
             info = self.dynamicCall(cmd)
@@ -429,8 +502,8 @@ class Kiwoom(QAxWidget):
         self.requestLoop = QEventLoop()
         self.requestLoop.exec_()
 
-#QString CommGetData(QString sJongmokCode,  QString sRealType, QString sFieldName, int nIndex, QString sInnerFieldName);
-#QString GetCommData(QString strTrCode,     QString strRecordName, int nIndex, QString strItemName);
+    # QString CommGetData(QString sJongmokCode,  QString sRealType, QString sFieldName, int nIndex, QString sInnerFieldName);
+    # QString GetCommData(QString strTrCode,     QString strRecordName, int nIndex, QString strItemName);
 
     def commGetData(self, trCode, realType, requestName, index, key):
         """
@@ -654,80 +727,8 @@ class Kiwoom(QAxWidget):
         self.dynamicCall("SetRealRemove(QString, QString)", screenNo, code)
 
     ###############################################################
-    # 메서드 정의: 조건검색 관련 메서드와 이벤트                            #
+    # 메서드 정의: 조건검색 관련 메서드
     ###############################################################
-
-    def receiveConditionVer(self, receive, msg):
-        """
-        getConditionLoad() 메서드의 조건식 목록 요청에 대한 응답 이벤트
-
-        :param receive: int - 응답결과(1: 성공, 나머지 실패)
-        :param msg: string - 메세지
-        """
-
-        try:
-            if not receive:
-                return
-
-            self.condition = self.getConditionNameList()
-            print("조건식 개수: ",
-                  (self.condition))
-
-            for key in self.condition.keys():
-                print("조건식: ", key, ": ", self.condition[key])
-                print("key type: ", type(key))
-
-        except Exception as e:
-            print(e)
-
-        finally:
-            self.conditionLoop.exit()
-
-    def receiveTrCondition(self, screenNo, codes, conditionName, conditionIndex, inquiry):
-        """
-        (1회성, 실시간) 종목 조건검색 요청시 발생되는 이벤트
-
-        :param screenNo: string
-        :param codes: string - 종목코드 목록(각 종목은 세미콜론으로 구분됨)
-        :param conditionName: string - 조건식 이름
-        :param conditionIndex: int - 조건식 인덱스
-        :param inquiry: int - 조회구분(0: 남은데이터 없음, 2: 남은데이터 있음)
-        """
-
-        print("[receiveTrCondition]")
-
-        try:
-            if codes == "":
-                return
-
-            codeList = codes.split(';')
-            del codeList[-1]
-
-            print(codeList)
-            print("종목개수: ", len(codeList))
-
-            self.realConditionCodeList += codeList
-
-        finally:
-            self.conditionLoop.exit()
-
-    def receiveRealCondition(self, code, event, conditionName, conditionIndex):
-        """
-        실시간 종목 조건검색 요청시 발생되는 이벤트
-
-        :param code: string - 종목코드
-        :param event: string - 이벤트종류("I": 종목편입, "D": 종목이탈)
-        :param conditionName: string - 조건식 이름
-        :param conditionIndex: string - 조건식 인덱스(여기서만 인덱스가 string 타입으로 전달됨)
-        """
-
-        print("[receiveRealCondition]")
-
-        print("종목코드: ", code)
-        print("이벤트: ", "종목편입" if event == "I" else "종목이탈")
-
-        if event == "I":
-            self.realConditionCodeList.append(code)
 
     def getConditionLoad(self):
         """ 조건식 목록 요청 메서드 """
@@ -916,8 +917,7 @@ class Kiwoom(QAxWidget):
 
         cmd = 'GetCodeListByMarket("%s")' % market
         codeList = self.dynamicCall(cmd)
-        ret = codeList.split(';')
-        return ret
+        return codeList.split(';')
 
     def getCodeList(self, *market):
         """
@@ -1036,7 +1036,6 @@ if __name__ == "__main__":
 
         else:
             print("모의투자 서버입니다.")
-
     except Exception as e:
         print(e)
 
