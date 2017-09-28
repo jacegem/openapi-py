@@ -9,9 +9,8 @@ import sys, time
 # from PyQt4.QtCore import Qt, QTimer, QTime
 from PyQt4.QtCore import QTimer, QTime
 from PyQt4.QtGui import QMainWindow, QApplication, QTableWidgetItem, QMessageBox
-from PyQt4 import uic, Qt
-from Kiwoom import Kiwoom, ParameterTypeError, ParameterValueError, KiwoomProcessingError, KiwoomConnectError
-
+from PyQt4 import uic
+from Kiwoom import Kiwoom, ParameterTypeError, ParameterValueError, KiwoomProcessingError, KiwoomConnectError, Qt
 
 ui = uic.loadUiType("pytrader.ui")[0]
 

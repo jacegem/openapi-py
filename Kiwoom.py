@@ -8,6 +8,8 @@ import logging
 import logging.config
 from pandas import DataFrame
 
+from Event.OPW00018 import OPW00018
+
 '''PYTHON 2'''
 from PyQt4.QAxContainer import QAxWidget
 from PyQt4.QtCore import *
@@ -215,8 +217,7 @@ class Kiwoom(QAxWidget):
             self.opw00001Data = deposit
 
         elif requestName == "계좌평가잔고내역요청":
-            OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2,
-                                   deprecated3, deprecated4)
+            OPW00018.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4)
         try:
             self.requestLoop.exit()
         except AttributeError:
