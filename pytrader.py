@@ -4,10 +4,9 @@ QtDesigner로 만든 UI와 해당 UI의 위젯에서 발생하는 이벤트를 �
 """
 
 import sys, time
-# from PyQt4.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem
-# from PyQt4.QtCore import Qt, QTimer, QTime
-from PyQt4.QtGui import QMainWindow, QApplication
-from PyQt4 import uic
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem
+from PyQt5.QtCore import Qt, QTimer, QTime
+from PyQt5 import uic
 from Kiwoom import Kiwoom, ParameterTypeError, ParameterValueError, KiwoomProcessingError, KiwoomConnectError
 
 ui = uic.loadUiType("pytrader.ui")[0]
@@ -157,7 +156,7 @@ class MyWindow(QMainWindow, ui):
 
                 self.kiwoom.setInputValue("계좌번호", self.accountComboBox.currentText())
                 self.kiwoom.setInputValue("비밀번호", "0000")
-                self.kiwoom.commRqData("계좌평가잔고내역요청", "opw00018", 2, "2")
+                self.kiwoom.commRqData("계좌평가잔고내역요청", "opw00018", 2, "2000")
 
         except (ParameterTypeError, ParameterValueError, KiwoomProcessingError) as e:
             self.showDialog('Critical', e)
@@ -352,7 +351,26 @@ class MyWindow(QMainWindow, ui):
         """ 매도전략을 이용하여 매도할 종목 선정 """
 
         # TODO: 매도전략 작성
+        try:
+            # ["종목명", "종목코드", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
+            stockList = self.kiwoom.opw00018Data_copy['stocks']
 
+            if len(stockList) == 0:
+                return []
+
+            # 매수할 종목 리스트
+            codeList = []
+
+            for (codeName, code, volume, buy, cur, profit, profit_ratio) in stockList:
+                code = code[-6:]
+                if (float(profit_ratio) < -2) or (float(profit_ratio) > 2):
+                    order = "매도;{};시장가;{};0;매도전".format(code, volume)
+                    codeList.append(order)
+                    self.kiwoom.setRealRemove("0156", code)
+                    # self.todayBuyList.remove(code)
+            return codeList
+        except Exception as e:
+            print(e)
         return []
 
 
