@@ -80,6 +80,7 @@ class Kiwoom(QAxWidget):
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
         self.log = logging.getLogger('Kiwoom')
+        self.log.setLevel('INFO')
 
     ###############################################################
     # 로깅용 메서드 정의                                               #
@@ -105,6 +106,8 @@ class Kiwoom(QAxWidget):
 
         :param returnCode: int
         """
+        self.log.info("[eventConnect]")
+        self.log.debug("returnCode : {}".format(returnCode))
 
         try:
             if returnCode == ReturnCode.OP_ERR_NONE:
@@ -142,8 +145,8 @@ class Kiwoom(QAxWidget):
         :param trCode: string
         :param msg: string - 서버로 부터의 메시지
         """
-
-        self.log.info("receiveMsg : {}, {}, {}, {}".format(screenNo, requestName, trCode, msg))
+        self.log.info("[receiveMsg]")
+        self.log.debug("screenNo, requestName, trCode, msg : {}, {}, {}, {}".format(screenNo, requestName, trCode, msg))
         self.msg += requestName + ": " + msg + "\r\n\r\n"
 
     def receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,
@@ -161,8 +164,8 @@ class Kiwoom(QAxWidget):
         :param recordName: string
         :param inquiry: string - 조회('0': 남은 데이터 없음, '2': 남은 데이터 있음)
         """
-
-        self.log.info("receiveTrData 실행: {0:5} {1:10} {2:5} {3:3}".format(screenNo, requestName, trCode, recordName, inquiry))
+        self.log.info("[receiveTrData]")
+        self.log.debug("screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4 : {0:5} {1:10} {2:5} {3:3}".format(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4))
         # 주문번호와 주문루프
         self.orderNo = self.getCommData(trCode, requestName, 0, "주문번호")
 
@@ -252,6 +255,8 @@ class Kiwoom(QAxWidget):
         :param receive: int - 응답결과(1: 성공, 나머지 실패)
         :param msg: string - 메세지
         """
+        self.log.info("[receiveConditionVer]")
+        self.log.debug("receive, msg : ({}, {})".format(receive, msg))
 
         try:
             if not receive:
@@ -280,7 +285,8 @@ class Kiwoom(QAxWidget):
         :param conditionIndex: int - 조건식 인덱스
         :param inquiry: int - 조회구분(0: 남은데이터 없음, 2: 남은데이터 있음)
         """
-
+        self.log.info("[receiveTrCondition]")
+        self.log.debug("screenNo, codes, conditionName, conditionIndex, inquiry : ({}, {}, {}, {}, {})".format(screenNo, codes, conditionName, conditionIndex, inquiry))
         print("[receiveTrCondition]")
 
         try:
@@ -310,11 +316,9 @@ class Kiwoom(QAxWidget):
         :param realType: string - 실시간 타입(KOA의 실시간 목록 참조)
         :param realData: string - 실시간 데이터 전문
         """
-        print("REAL DATA")
+        self.log.info("[receiveRealData]")
+        self.log.debug("code, realType, realData : ({}, {}, {})".format(code, realType, realData))
         try:
-            self.log.debug("[receiveRealData]")
-            self.log.debug("({})".format(realType))
-
             if realType not in RealType.REALTYPE:
                 return
 
@@ -346,6 +350,8 @@ class Kiwoom(QAxWidget):
         :param itemCnt: int - fid의 갯수
         :param fidList: string - fidList 구분은 ;(세미콜론) 이다.
         """
+        self.log.info("[receiveChejanData]")
+        self.log.debug("gubun, itemCnt, fidList : ({}, {}, {})".format(gubun, itemCnt, fidList))
 
         fids = fidList.split(';')
         print("[receiveChejanData]")
@@ -365,6 +371,8 @@ class Kiwoom(QAxWidget):
         :param conditionName: string - 조건식 이름
         :param conditionIndex: string - 조건식 인덱스(여기서만 인덱스가 string 타입으로 전달됨)
         """
+        self.log.info("[receiveRealCondition]")
+        self.log.debug("code, event, conditionName, conditionIndex : ({}, {}, {}, {})".format(code, event, conditionName, conditionIndex))
 
         print("[receiveRealCondition]")
 
@@ -376,6 +384,8 @@ class Kiwoom(QAxWidget):
 
     def receiveInvestRealData(self, sRealKey):
         print("ON receive invest Real Data")
+        self.log.info("[receiveInvestRealData]")
+        self.log.debug("sRealKey : ({})".format(sRealKey))
 
     ###############################################################
     # 메서드 정의: 로그인 관련 메서드                                    #
@@ -388,6 +398,8 @@ class Kiwoom(QAxWidget):
         수동 로그인일 경우, 로그인창을 출력해서 로그인을 시도.
         자동 로그인일 경우, 로그인창 출력없이 로그인 시도.
         """
+        self.log.info("[commConnect]")
+
         self.dynamicCall("CommConnect()")
         self.loginLoop = QEventLoop()
         self.loginLoop.exec_()
@@ -401,6 +413,7 @@ class Kiwoom(QAxWidget):
 
         :return: int
         """
+        self.log.info("[getConnectState]")
 
         state = self.dynamicCall("GetConnectState()")
         return state
@@ -420,7 +433,9 @@ class Kiwoom(QAxWidget):
         :param isConnectState: bool - 접속상태을 확인할 필요가 없는 경우 True로 설정.
         :return: string
         """
-        self.log.debug("getLoginInfo")
+        self.log.info("[getLoginInfo]")
+        self.log.debug("tag, isConnectState : ({}, {})".format(tag, isConnectState))
+
         if not isConnectState:
             if not self.getConnectState():
                 raise KiwoomConnectError()
@@ -447,6 +462,7 @@ class Kiwoom(QAxWidget):
 
         :return: string
         """
+        self.log.info("[getServerGubun]")
 
         ret = self.dynamicCall("KOA_Functions(QString, QString)", "GetServerGubun", "")
         return ret
@@ -463,6 +479,8 @@ class Kiwoom(QAxWidget):
         :param key: string - TR에 명시된 input 이름
         :param value: string - key에 해당하는 값
         """
+        self.log.info("[setInputValue]")
+        self.log.debug("key, value : ({}, {})".format(key, value))
 
         if not (isinstance(key, str) and isinstance(value, str)):
             raise ParameterTypeError()
@@ -480,6 +498,8 @@ class Kiwoom(QAxWidget):
         :param inquiry: int - 조회(0: 조회, 2: 남은 데이터 이어서 요청)
         :param screenNo: string - 화면번호(4자리)
         """
+        self.log.info("[commRqData]")
+        self.log.debug("requestName, trCode, inquiry, screenNo : ({}, {}, {}, {})".format(requestName, trCode, inquiry, screenNo))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -512,6 +532,8 @@ class Kiwoom(QAxWidget):
         :param key: string - 수신 데이터에서 얻고자 하는 값의 키(출력항목이름)
         :return: string
         """
+        self.log.info("[getCommData]")
+        self.log.debug("trCode, requestName, index, key : ({}, {}, {}, {})".format(trCode, requestName, index, key))
 
         if not (isinstance(trCode, str)
                 and isinstance(requestName, str)
@@ -540,6 +562,8 @@ class Kiwoom(QAxWidget):
         :param requestName: string - TR 요청명(commRqData() 메소드 호출시 사용된 requestName)
         :return: int
         """
+        self.log.info("[getRepeatCnt]")
+        self.log.debug("trCode, requestName : ({}, {})".format( trCode, requestName))
 
         if not (isinstance(trCode, str)
                 and isinstance(requestName, str)):
@@ -558,6 +582,8 @@ class Kiwoom(QAxWidget):
         :param multiDataName: string - KOA에 명시된 멀티데이터명
         :return: list - 중첩리스트
         """
+        self.log.info("[getCommDataEx]")
+        self.log.debug("trCode, multiDataName : ({}, {})".format(trCode, multiDataName))
 
         if not (isinstance(trCode, str)
                 and isinstance(multiDataName, str)):
@@ -593,6 +619,8 @@ class Kiwoom(QAxWidget):
         :param typeFlag: int - 주식과 선물옵션 구분(0: 주식, 3: 선물옵션), 주의: 매개변수의 위치를 맨 뒤로 이동함.
         :return: list - 중첩 리스트 [[종목코드, 종목명 ... 종목 정보], [종목코드, 종목명 ... 종목 정보]]
         """
+        self.log.info("[commKwRqData]")
+        self.log.debug("codes, inquiry, codeCount, requestName, screenNo, typeFlag : ({}, {}, {}, {}, {}, {})".format(codes, inquiry, codeCount, requestName, screenNo, typeFlag))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -628,6 +656,8 @@ class Kiwoom(QAxWidget):
 
         :param screenNo: string
         """
+        self.log.info("[disconnectRealData]")
+        self.log.debug("screenNo : ({})".format(screenNo))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -647,6 +677,8 @@ class Kiwoom(QAxWidget):
         :param fid: - 실시간 타입에 포함된 fid
         :return: string - fid에 해당하는 데이터
         """
+        self.log.info("[getCommRealData]")
+        self.log.debug("code, fid : ({}, {})".format(tcode, fid))
 
         if not (isinstance(code, str)
                 and isinstance(fid, int)):
@@ -673,6 +705,8 @@ class Kiwoom(QAxWidget):
         :param fids: string - fid 리스트(fid;fid;...)
         :param realRegType: string - 실시간등록타입(0: 첫 등록, 1: 추가 등록)
         """
+        self.log.info("[setRealReg]")
+        self.log.debug("screenNo, codes, fids, realRegType : ({}, {}, {}, {})".format(screenNo, codes, fids, realRegType))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -695,6 +729,8 @@ class Kiwoom(QAxWidget):
         :param screenNo: string - 화면번호 또는 ALL 키워드 사용가능
         :param code: string - 종목코드 또는 ALL 키워드 사용가능
         """
+        self.log.info("[setRealRemove]")
+        self.log.debug("screenNo, code : ({}, {})".format(screenNo, code))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -711,6 +747,7 @@ class Kiwoom(QAxWidget):
 
     def getConditionLoad(self):
         """ 조건식 목록 요청 메서드 """
+        self.log.info("[getConditionLoad]")
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -734,6 +771,7 @@ class Kiwoom(QAxWidget):
 
         :return: dict - {인덱스:조건명, 인덱스:조건명, ...}
         """
+        self.log.info("[getConditionNameList]")
 
         data = self.dynamicCall("GetConditionNameList()")
 
@@ -768,6 +806,8 @@ class Kiwoom(QAxWidget):
         :param conditionIndex: int - 조건식 인덱스
         :param isRealTime: int - 조건검색 조회구분(0: 1회성 조회, 1: 실시간 조회)
         """
+        self.log.info("[sendCondition]")
+        self.log.debug("screenNo, conditionName, conditionIndex, isRealTime : ({}, {}, {}, {})".format(screenNo, conditionName, conditionIndex, isRealTime))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -790,6 +830,8 @@ class Kiwoom(QAxWidget):
 
     def sendConditionStop(self, screenNo, conditionName, conditionIndex):
         """ 종목 조건검색 중지 메서드 """
+        self.log.info("[sendConditionStop]")
+        self.log.debug("screenNo, conditionName, conditionIndex : ({}, {}, {})".format(screenNo, conditionName, conditionIndex))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -827,6 +869,8 @@ class Kiwoom(QAxWidget):
         :param hogaType: string - 거래구분(00: 지정가, 03: 시장가, 05: 조건부지정가, 06: 최유리지정가, 그외에는 api 문서참조)
         :param originOrderNo: string - 원주문번호(신규주문에는 공백, 정정및 취소주문시 원주문번호르 입력합니다.)
         """
+        self.log.info("[sendOrder]")
+        self.log.debug("requestName, screenNo, accountNo, orderType, code, qty, price, hogaType, originOrderNo : ({}, {}, {}, {}, {}, {}, {}, {}, {})".format(requestName, screenNo, accountNo, orderType, code, qty, price, hogaType, originOrderNo))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -862,6 +906,8 @@ class Kiwoom(QAxWidget):
         :param fid: int
         :return: string
         """
+        self.log.info("[getChejanData]")
+        self.log.debug("fid : ({})".format(fid))
 
         if not isinstance(fid, int):
             raise ParameterTypeError()
@@ -884,6 +930,8 @@ class Kiwoom(QAxWidget):
         :param market: string
         :return: List
         """
+        self.log.info("[getCodeListByMarket]")
+        self.log.debug("market : ({})".format(market))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -905,6 +953,8 @@ class Kiwoom(QAxWidget):
         :param market: Tuple - 여러 개의 문자열을 매개변수로 받아 Tuple로 처리한다.
         :return: List
         """
+        self.log.info("[getCodeList]")
+        self.log.debug("*market : ({})".format(*market))
 
         codeList = []
 
@@ -921,6 +971,8 @@ class Kiwoom(QAxWidget):
         :param code: string - 종목코드
         :return: string - 종목코드의 한글명
         """
+        self.log.info("[getMasterCodeName]")
+        self.log.debug("code : ({})".format(code))
 
         if not self.getConnectState():
             raise KiwoomConnectError()
@@ -933,6 +985,8 @@ class Kiwoom(QAxWidget):
         return name
 
     def changeFormat(self, data, percent=0):
+        self.log.info("[changeFormat]")
+        self.log.debug("data, percent : ({})".format(data, percent))
 
         if percent == 0:
             d = int(data)

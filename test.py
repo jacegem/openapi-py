@@ -1,31 +1,30 @@
 # -*-coding:utf-8 -*-
 import sys
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-from PyQt4.QAxContainer import *
+from PyQt5.QtWidgets import QMainWindow, QPushButton
+from PyQt5.QAxContainer import QAxWidget
+from PyQt5.QtWidgets import QApplication
+
 
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
         self.setWindowTitle("PyStock")
         self.setGeometry(300, 300, 300, 400)
-        print(dir(self))
 
-        print(dir(QMainWindow))
         self.kiwoom = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
-        self.kiwoom.connect(self.kiwoom, SIGNAL("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self.OnReceiveTrData)
+        self.kiwoom.OnReceiveTrData.connect(self.OnReceiveTrData)
 
         btn1 = QPushButton("Log In", self)
         btn1.move(20, 20)
-        self.connect(btn1, SIGNAL("clicked()"), self.btn_clicked)
+        btn1.clicked.connect(self.btn_clicked)
 
         btn2 = QPushButton("Get Info", self)
         btn2.move(20, 70)
-        self.connect(btn2, SIGNAL("clicked()"), self.btn_clicked2)
+        btn2.clicked.connect(self.btn_clicked2)
 
         btn3 = QPushButton("connect state", self)
         btn3.move(20, 120)
-        self.connect(btn3, SIGNAL("clicked()"), self.btn_clicked3)
+        btn3.clicked.connect(self.btn_clicked3)
 
     def OnReceiveTrData(self, sScrNo, sRQName, sTRCode, sRecordName, sPreNext, nDataLength, sErrorCode, sMessage, sSPlmMsg):
         if sRQName == "주식기본정보":
@@ -51,8 +50,6 @@ class MyWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    print("")
-    print(dir(QApplication))
     myWindow = MyWindow()
     myWindow.show()
     app.exec_()
