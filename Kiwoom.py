@@ -143,6 +143,7 @@ class Kiwoom(QAxWidget):
         :param msg: string - 서버로 부터의 메시지
         """
 
+        self.log.info("receiveMsg : {}, {}, {}, {}".format(screenNo, requestName, trCode, msg))
         self.msg += requestName + ": " + msg + "\r\n\r\n"
 
     def receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,
@@ -161,10 +162,9 @@ class Kiwoom(QAxWidget):
         :param inquiry: string - 조회('0': 남은 데이터 없음, '2': 남은 데이터 있음)
         """
 
-        print("receiveTrData 실행: ", screenNo, requestName, trCode, recordName, inquiry)
-
+        self.log.info("receiveTrData 실행: {0:5} {1:10} {2:5} {3:3}".format(screenNo, requestName, trCode, recordName, inquiry))
         # 주문번호와 주문루프
-        self.orderNo = self.commGetData(trCode, "", requestName, 0, "주문번호")
+        self.orderNo = self.getCommData(trCode, requestName, 0, "주문번호")
 
         try:
             self.orderLoop.exit()
@@ -178,11 +178,11 @@ class Kiwoom(QAxWidget):
             print(type(data))
             print(data)
 
-            """ commGetData
+            """ getCommData
             cnt = self.getRepeatCnt(trCode, requestName)
 
             for i in range(cnt):
-                data = self.commGetData(trCode, "", requestName, i, "종목명")
+                data = self.getCommData(trCode, requestName, i, "종목명")
                 print(data)
             """
 
@@ -199,7 +199,7 @@ class Kiwoom(QAxWidget):
             # self.data = DataFrame(data, columns=colName)
 
         elif requestName == "예수금상세현황요청":
-            deposit = self.commGetData(trCode, "", requestName, 0, "d+2추정예수금")
+            deposit = self.getCommData(trCode, requestName, 0, "d+2추정예수금")
             deposit = self.changeFormat(deposit)
             self.opw00001Data = deposit
 
@@ -210,7 +210,7 @@ class Kiwoom(QAxWidget):
             keyList = ["총매입금액", "총평가금액", "총평가손익금액", "총수익률(%)", "추정예탁자산"]
 
             for key in keyList:
-                value = self.commGetData(trCode, "", requestName, 0, key)
+                value = self.getCommData(trCode, requestName, 0, key)
 
                 # if key.startswith("총수익률"):
                 #     value = self.changeFormat(value, 1)
@@ -229,7 +229,7 @@ class Kiwoom(QAxWidget):
                 stock = []
 
                 for key in keyList:
-                    value = self.commGetData(trCode, "", requestName, i, key)
+                    value = self.getCommData(trCode, requestName, i, key)
 
                     if key.startswith("수익률"):
                         value = self.changeFormat(value, 2)
@@ -388,7 +388,6 @@ class Kiwoom(QAxWidget):
         수동 로그인일 경우, 로그인창을 출력해서 로그인을 시도.
         자동 로그인일 경우, 로그인창 출력없이 로그인 시도.
         """
-
         self.dynamicCall("CommConnect()")
         self.loginLoop = QEventLoop()
         self.loginLoop.exec_()
@@ -421,7 +420,7 @@ class Kiwoom(QAxWidget):
         :param isConnectState: bool - 접속상태을 확인할 필요가 없는 경우 True로 설정.
         :return: string
         """
-
+        self.log.debug("getLoginInfo")
         if not isConnectState:
             if not self.getConnectState():
                 raise KiwoomConnectError()
@@ -434,10 +433,9 @@ class Kiwoom(QAxWidget):
 
         if tag == "GetServerGubun":
             info = self.getServerGubun()
-            print("GET LOGIN INFO : {}".format(info))
 
         else:
-            cmd = 'GetLoginInfo("%s")' % tag
+            cmd = 'GetLoginInfo("{}")'.format(tag)
             info = self.dynamicCall(cmd)
 
         return info
@@ -501,26 +499,6 @@ class Kiwoom(QAxWidget):
         # 루프 생성: receiveTrData() 메서드에서 루프를 종료시킨다.
         self.requestLoop = QEventLoop()
         self.requestLoop.exec_()
-
-    # QString CommGetData(QString sJongmokCode,  QString sRealType, QString sFieldName, int nIndex, QString sInnerFieldName);
-    # QString GetCommData(QString strTrCode,     QString strRecordName, int nIndex, QString strItemName);
-
-    def commGetData(self, trCode, realType, requestName, index, key):
-        """
-        데이터 획득 메서드
-
-        receiveTrData() 이벤트 메서드가 호출될 때, 그 안에서 조회데이터를 얻어오는 메서드입니다.
-        getCommData() 메서드로 위임.
-
-        :param trCode: string
-        :param realType: string - TR 요청시 ""(빈문자)로 처리
-        :param requestName: string - TR 요청명(commRqData() 메소드 호출시 사용된 requestName)
-        :param index: int
-        :param key: string
-        :return: string
-        """
-
-        return self.getCommData(trCode, requestName, index, key)
 
     def getCommData(self, trCode, requestName, index, key):
         """
@@ -645,6 +623,7 @@ class Kiwoom(QAxWidget):
         """
         해당 화면번호로 설정한 모든 실시간 데이터 요청을 제거합니다.
 
+        receiveTrData,, 이벤트내에서 호출해주시기 바랍니다.
         화면을 종료할 때 반드시 이 메서드를 호출해야 합니다.
 
         :param screenNo: string
@@ -887,7 +866,7 @@ class Kiwoom(QAxWidget):
         if not isinstance(fid, int):
             raise ParameterTypeError()
 
-        cmd = 'GetChejanData("%s")' % fid
+        cmd = 'GetChejanData("{}")'.format(fid)
         data = self.dynamicCall(cmd)
         return data
 
@@ -915,7 +894,7 @@ class Kiwoom(QAxWidget):
         if market not in ['0', '3', '4', '5', '6', '8', '9', '10', '30']:
             raise ParameterValueError()
 
-        cmd = 'GetCodeListByMarket("%s")' % market
+        cmd = 'GetCodeListByMarket("{}")'.format(market)
         codeList = self.dynamicCall(cmd)
         return codeList.split(';')
 
@@ -949,7 +928,7 @@ class Kiwoom(QAxWidget):
         if not isinstance(code, str):
             raise ParameterTypeError()
 
-        cmd = 'GetMasterCodeName("%s")' % code
+        cmd = 'GetMasterCodeName("{}")'.format(code)
         name = self.dynamicCall(cmd)
         return name
 

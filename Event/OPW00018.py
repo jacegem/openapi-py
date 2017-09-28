@@ -7,7 +7,7 @@ class OPW00018():
         keyList = ["총매입금액", "총평가금액", "총평가손익금액", "총수익률(%)", "추정예탁자산"]
 
         for key in keyList:
-            value = self.commGetData(trCode, "", requestName, 0, key)
+            value = self.getCommData(trCode, requestName, 0, key)
 
             if key.startswith("총수익률"):
                 value = self.changeFormat(value, 1)
@@ -26,7 +26,7 @@ class OPW00018():
             stock = []
 
             for key in keyList:
-                value = self.commGetData(trCode, "", requestName, i, key)
+                value = self.getCommData(trCode, requestName, i, key)
 
                 if key.startswith("수익률"):
                     value = self.changeFormat(value, 2)
