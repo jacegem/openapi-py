@@ -61,6 +61,7 @@ class MyWindow(QMainWindow, ui):
 
         # 자동 선정 종목 리스트 테이블 설정
         # self.setAutomatedStocks()
+        self.DDD()
         self.kiwoom.log.info("# MyWindow Init End")
 
     def timeout(self):
@@ -393,7 +394,7 @@ class MyWindow(QMainWindow, ui):
         return []
 
     def DDD(self):
-        stock_list = ['900050', '000020', '000030', '000040', '000050', '000060', '000070', '000075', '000080', '000087' ]
+        stock_list = ['000020', '000030', '000040', '000050', '000060', '000070', '000075', '000080', '000087' ]
         for stock in stock_list:
             self.kiwoom.setInputValue("종목코드", stock)
             self.kiwoom.setInputValue("기준일자", '2017-09-29')
