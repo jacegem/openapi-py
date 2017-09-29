@@ -80,7 +80,6 @@ class Kiwoom(QAxWidget):
         # 로깅용 설정파일
         logging.config.fileConfig('logging.conf')
         self.log = logging.getLogger('Kiwoom')
-        self.log.setLevel('INFO')
 
     ###############################################################
     # 로깅용 메서드 정의                                               #
@@ -954,7 +953,7 @@ class Kiwoom(QAxWidget):
         :return: List
         """
         self.log.info("[getCodeList]")
-        self.log.debug("*market : ({})".format(*market))
+        self.log.debug("*market, market : ({}, {})".format(*market, market))
 
         codeList = []
 
@@ -1004,6 +1003,8 @@ class Kiwoom(QAxWidget):
 
     def opwDataReset(self):
         """ 잔고 및 보유종목 데이터 초기화 """
+        self.log.info("[opwDataReset]")
+
         self.opw00001Data = 0
         self.opw00018Data = {'accountEvaluation': [], 'stocks': []}
 

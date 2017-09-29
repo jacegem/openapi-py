@@ -15,11 +15,14 @@ ui = uic.loadUiType("pytrader.ui")[0]
 class MyWindow(QMainWindow, ui):
     def __init__(self):
         super().__init__()
+
         self.setupUi(self)
         self.show()
 
         self.kiwoom = Kiwoom()
         self.kiwoom.commConnect()
+        #self.kiwoom.log.setLevel('INFO')
+        self.kiwoom.log.info("# MyWindow Init Start")
 
         self.server = self.kiwoom.getLoginInfo("GetServerGubun")
 
@@ -51,14 +54,17 @@ class MyWindow(QMainWindow, ui):
 
         # 당일 매수한 종목 리스트
         self.todayBuyList = []
+        self.stockList = dict()
 
         # 실시간 조건검색 시작
         self.realtimeConditonStart()
 
         # 자동 선정 종목 리스트 테이블 설정
         # self.setAutomatedStocks()
+        self.kiwoom.log.info("# MyWindow Init End")
 
     def timeout(self):
+        self.kiwoom.log.info("# timeout : {}".format(self))
         """ 타임아웃 이벤트가 발생하면 호출되는 메서드 """
 
         # 어떤 타이머에 의해서 호출되었는지 확인
@@ -98,6 +104,7 @@ class MyWindow(QMainWindow, ui):
                 self.inquiryBalance()
 
     def setCodeName(self):
+        self.kiwoom.log.info("# setCodeName")
         """ 종목코드에 해당하는 한글명을 codeNameLineEdit에 설정한다. """
 
         code = self.codeLineEdit.text()
@@ -107,6 +114,7 @@ class MyWindow(QMainWindow, ui):
             self.codeNameLineEdit.setText(codeName)
 
     def setAccountComboBox(self):
+        self.kiwoom.log.info("# setAccountComboBox")
         """ accountComboBox에 계좌번호를 설정한다. """
 
         try:
@@ -117,6 +125,7 @@ class MyWindow(QMainWindow, ui):
             self.showDialog('Critical', e)
 
     def sendOrder(self):
+        self.kiwoom.log.info("# sendOrder")
         """ 키움서버로 주문정보를 전송한다. """
 
         orderTypeTable = {'신규매수': 1, '신규매도': 2, '매수취소': 3, '매도취소': 4}
@@ -136,6 +145,7 @@ class MyWindow(QMainWindow, ui):
             self.showDialog('Critical', e)
 
     def inquiryBalance(self):
+        self.kiwoom.log.info("# inquiryBalance")
         """ 예수금상세현황과 계좌평가잔고내역을 요청후 테이블에 출력한다. """
 
         self.inquiryTimer.stop()
@@ -187,6 +197,10 @@ class MyWindow(QMainWindow, ui):
 
         self.stocksTable.resizeRowsToContents()
 
+        # stock list
+        for (_, symbol, volume, _, _, _, profit_ratio) in self.kiwoom.opw00018Data['stocks']: # keyList = ["종목명", "종목번호", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
+            self.stockList[symbol] = (profit_ratio, volume)
+
         # 데이터 초기화
         self.kiwoom.opwDataReset()
 
@@ -195,6 +209,7 @@ class MyWindow(QMainWindow, ui):
 
     # 경고창
     def showDialog(self, grade, error):
+        self.kiwoom.log.info("# showDialog")
         gradeTable = {'Information': 1, 'Warning': 2, 'Critical': 3, 'Question': 4}
 
         dialog = QMessageBox()
@@ -205,6 +220,7 @@ class MyWindow(QMainWindow, ui):
         dialog.exec_()
 
     def setAutomatedStocks(self):
+        self.kiwoom.log.info("# setAutomatedStocks")
         fileList = ["buy_list.txt", "sell_list.txt"]
         automatedStocks = []
 
@@ -241,6 +257,7 @@ class MyWindow(QMainWindow, ui):
         self.automatedStocksTable.resizeRowsToContents()
 
     def automaticOrder(self):
+        self.kiwoom.log.info("# automaticOrder")
         fileList = ["buy_list.txt", "sell_list.txt"]
         hogaTypeTable = {'지정가': "00", '시장가': "03"}
         account = self.accountComboBox.currentText()
@@ -311,6 +328,7 @@ class MyWindow(QMainWindow, ui):
                     f.write(data)
 
     def realtimeConditonStart(self):
+        self.kiwoom.log.info("# realtimeConditionStart")
         """ 실시간 조건검색 시작 메서드 """
         try:
             self.kiwoom.getConditionLoad()
@@ -325,6 +343,7 @@ class MyWindow(QMainWindow, ui):
             print(e)
 
     def buyStrategy(self):
+        self.kiwoom.log.info("# BuyStrategy")
         """ 매수전략을 이용하여 매수할 종목 선정 """
 
         try:
@@ -348,20 +367,20 @@ class MyWindow(QMainWindow, ui):
             print(e)
 
     def sellStrategy(self):
+        self.kiwoom.log.info("# sellStrategy")
         """ 매도전략을 이용하여 매도할 종목 선정 """
 
         # TODO: 매도전략 작성
         try:
             # ["종목명", "종목코드", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
-            stockList = self.kiwoom.opw00018Data_copy['stocks']
 
-            if len(stockList) == 0:
+            if len(self.stockList) == 0:
                 return []
 
             # 매수할 종목 리스트
             codeList = []
 
-            for (codeName, code, volume, buy, cur, profit, profit_ratio) in stockList:
+            for (code, (profit_ratio, volume))  in self.stockList.items():
                 code = code[-6:]
                 if (float(profit_ratio) < -2) or (float(profit_ratio) > 2):
                     order = "매도;{};시장가;{};0;매도전".format(code, volume)
