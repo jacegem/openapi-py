@@ -392,6 +392,42 @@ class MyWindow(QMainWindow, ui):
             print(e)
         return []
 
+    def DDD(self):
+        stock_list = ['900050', '000020', '000030', '000040', '000050', '000060', '000070', '000075', '000080', '000087' ]
+        for stock in stock_list:
+            self.kiwoom.setInputValue("종목코드", stock)
+            self.kiwoom.setInputValue("기준일자", '2017-09-29')
+            self.kiwoom.setInputValue("수정주가구분", '0')
+            self.kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 0, "0615")
+            for cnt in self.kiwoom.data:
+                print("""replace into opt10081
+                          (symbol, close, volume, volume_price, date,
+                          open, high, low, modify_gubun, modify_ratio,
+                          big_gubun, small_gubun, symbol_inform, modify_event, before_close) values
+                              ({}, {}, {}, {}, {},
+                               {}, {}, {}, {}, {},
+                               {}, {}, {}, {}, {})
+                              """.format(stock, cnt[1], cnt[2], cnt[3], cnt[4],
+                                    cnt[5], cnt[6], cnt[7], cnt[8], cnt[9],
+                                    cnt[10], cnt[11], cnt[12], cnt[13], cnt[14]))
+            time.sleep(0.5)
+            while self.kiwoom.inquiry == '2':
+                self.kiwoom.setInputValue("종목코드", stock)
+                self.kiwoom.setInputValue("기준일자", '2017-09-29')
+                self.kiwoom.setInputValue("수정주가구분", '0')
+                self.kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 2, "0615")
+                for cnt in self.kiwoom.data:
+                    print("""replace into opt10081
+                              (symbol, close, volume, volume_price, date,
+                              open, high, low, modify_gubun, modify_ratio,
+                              big_gubun, small_gubun, symbol_inform, modify_event, before_close) values
+                                  ({}, {}, {}, {}, {},
+                                   {}, {}, {}, {}, {},
+                                   {}, {}, {}, {}, {})
+                                  """.format(stock, cnt[1], cnt[2], cnt[3], cnt[4],
+                                             cnt[5], cnt[6], cnt[7], cnt[8], cnt[9],
+                                             cnt[10], cnt[11], cnt[12], cnt[13], cnt[14]))
+                time.sleep(0.5)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

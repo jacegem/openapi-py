@@ -105,7 +105,7 @@ class Kiwoom(QAxWidget):
 
         :param returnCode: int
         """
-        self.log.info("[eventConnect]")
+        self.log.info("<<eventConnect>>")
         self.log.debug("returnCode : {}".format(returnCode))
 
         try:
@@ -144,7 +144,7 @@ class Kiwoom(QAxWidget):
         :param trCode: string
         :param msg: string - 서버로 부터의 메시지
         """
-        self.log.info("[receiveMsg]")
+        self.log.info("<<receiveMsg>>")
         self.log.debug("screenNo, requestName, trCode, msg : {}, {}, {}, {}".format(screenNo, requestName, trCode, msg))
         self.msg += requestName + ": " + msg + "\r\n\r\n"
 
@@ -163,7 +163,7 @@ class Kiwoom(QAxWidget):
         :param recordName: string
         :param inquiry: string - 조회('0': 남은 데이터 없음, '2': 남은 데이터 있음)
         """
-        self.log.info("[receiveTrData]")
+        self.log.info("<<receiveTrData>>")
         self.log.debug("screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4 : {0:5} {1:10} {2:5} {3:3}".format(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4))
         # 주문번호와 주문루프
         self.orderNo = self.getCommData(trCode, requestName, 0, "주문번호")
@@ -254,7 +254,7 @@ class Kiwoom(QAxWidget):
         :param receive: int - 응답결과(1: 성공, 나머지 실패)
         :param msg: string - 메세지
         """
-        self.log.info("[receiveConditionVer]")
+        self.log.info("<<receiveConditionVer>>")
         self.log.debug("receive, msg : ({}, {})".format(receive, msg))
 
         try:
@@ -284,7 +284,7 @@ class Kiwoom(QAxWidget):
         :param conditionIndex: int - 조건식 인덱스
         :param inquiry: int - 조회구분(0: 남은데이터 없음, 2: 남은데이터 있음)
         """
-        self.log.info("[receiveTrCondition]")
+        self.log.info("<<receiveTrCondition>>")
         self.log.debug("screenNo, codes, conditionName, conditionIndex, inquiry : ({}, {}, {}, {}, {})".format(screenNo, codes, conditionName, conditionIndex, inquiry))
         print("[receiveTrCondition]")
 
@@ -315,7 +315,7 @@ class Kiwoom(QAxWidget):
         :param realType: string - 실시간 타입(KOA의 실시간 목록 참조)
         :param realData: string - 실시간 데이터 전문
         """
-        self.log.info("[receiveRealData]")
+        self.log.info("<<receiveRealData>>")
         self.log.debug("code, realType, realData : ({}, {}, {})".format(code, realType, realData))
         try:
             if realType not in RealType.REALTYPE:
@@ -349,7 +349,7 @@ class Kiwoom(QAxWidget):
         :param itemCnt: int - fid의 갯수
         :param fidList: string - fidList 구분은 ;(세미콜론) 이다.
         """
-        self.log.info("[receiveChejanData]")
+        self.log.info("<<receiveChejanData>>")
         self.log.debug("gubun, itemCnt, fidList : ({}, {}, {})".format(gubun, itemCnt, fidList))
 
         fids = fidList.split(';')
@@ -370,7 +370,7 @@ class Kiwoom(QAxWidget):
         :param conditionName: string - 조건식 이름
         :param conditionIndex: string - 조건식 인덱스(여기서만 인덱스가 string 타입으로 전달됨)
         """
-        self.log.info("[receiveRealCondition]")
+        self.log.info("<<receiveRealCondition>>")
         self.log.debug("code, event, conditionName, conditionIndex : ({}, {}, {}, {})".format(code, event, conditionName, conditionIndex))
 
         print("[receiveRealCondition]")
@@ -383,7 +383,7 @@ class Kiwoom(QAxWidget):
 
     def receiveInvestRealData(self, sRealKey):
         print("ON receive invest Real Data")
-        self.log.info("[receiveInvestRealData]")
+        self.log.info("<<receiveInvestRealData>>")
         self.log.debug("sRealKey : ({})".format(sRealKey))
 
     ###############################################################
@@ -447,7 +447,6 @@ class Kiwoom(QAxWidget):
 
         if tag == "GetServerGubun":
             info = self.getServerGubun()
-
         else:
             cmd = 'GetLoginInfo("{}")'.format(tag)
             info = self.dynamicCall(cmd)
