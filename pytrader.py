@@ -48,10 +48,10 @@ class MyWindow(QMainWindow, ui):
         self.orderBtn.clicked.connect(self.sendOrder)
         self.inquiryBtn.clicked.connect(self.inquiryBalance)
 
-        # 자동 주문
-        # 자동 주문을 활성화 하려면 True로 설정
-        self.isAutomaticOrder = True
 
+        # 자동 주문
+        self.isAutomaticOrder = self.AutomaticOrder_CheckBox.isChecked()
+        self.AutomaticOrder_CheckBox.stateChanged.connect(self.AutomaticOrder_CheckBox_change)
         # 당일 매수한 종목 리스트
         self.todayBuyList = []
         self.stockList = dict()
@@ -60,16 +60,16 @@ class MyWindow(QMainWindow, ui):
         self.realtimeConditonStart()
 
         # 자동 선정 종목 리스트 테이블 설정
-        # self.setAutomatedStocks()
-        self.DDD()
+        self.setAutomatedStocks()
+
         self.kiwoom.log.info("# MyWindow Init End")
 
     def timeout(self):
-        self.kiwoom.log.info("# timeout : {}".format(self))
         """ 타임아웃 이벤트가 발생하면 호출되는 메서드 """
 
         # 어떤 타이머에 의해서 호출되었는지 확인
         sender = self.sender()
+        self.kiwoom.log.info("# timeout : {}".format(sender))
 
         # 메인 타이머
         if id(sender) == id(self.timer):
@@ -89,10 +89,8 @@ class MyWindow(QMainWindow, ui):
 
             # 자동 주문 실행
             # 1100은 11시 00분을 의미합니다.
-            if self.isAutomaticOrder and int(automaticOrderTime) >= 900:
-                # self.isAutomaticOrder = False
+            if self.isAutomaticOrder and (900 <= int(automaticOrderTime) <= 2300):
                 self.automaticOrder()
-                # self.setAutomatedStocks()
 
             # log
             if self.kiwoom.msg:
@@ -100,9 +98,13 @@ class MyWindow(QMainWindow, ui):
                 self.kiwoom.msg = ""
 
         # 실시간 조회 타이머
+        # 잔고 및 보유종목 조회 타이머
         else:
             if self.realtimeCheckBox.isChecked():
                 self.inquiryBalance()
+
+    def AutomaticOrder_CheckBox_change(self):
+        self.isAutomaticOrder = self.AutomaticOrder_CheckBox.isChecked()
 
     def setCodeName(self):
         self.kiwoom.log.info("# setCodeName")
@@ -164,7 +166,6 @@ class MyWindow(QMainWindow, ui):
 
             while self.kiwoom.inquiry == '2':
                 time.sleep(0.2)
-
                 self.kiwoom.setInputValue("계좌번호", self.accountComboBox.currentText())
                 self.kiwoom.setInputValue("비밀번호", "0000")
                 self.kiwoom.commRqData("계좌평가잔고내역요청", "opw00018", 2, "2000")
@@ -328,6 +329,8 @@ class MyWindow(QMainWindow, ui):
                 for data in result:
                     f.write(data)
 
+        self.setAutomatedStocks()
+
     def realtimeConditonStart(self):
         self.kiwoom.log.info("# realtimeConditionStart")
         """ 실시간 조건검색 시작 메서드 """
@@ -358,7 +361,7 @@ class MyWindow(QMainWindow, ui):
 
             for code in stockList:
                 if code not in self.todayBuyList:
-                    order = "매수;{};시장가;10;0;매수전".format(code)
+                    order = "매수;{};시장가;10;0;매수전\n".format(code)
                     codeList.append(order)
                     # TODO: 매수전략 작성
 
@@ -384,7 +387,7 @@ class MyWindow(QMainWindow, ui):
             for (code, (profit_ratio, volume))  in self.stockList.items():
                 code = code[-6:]
                 if (float(profit_ratio) < -2) or (float(profit_ratio) > 2):
-                    order = "매도;{};시장가;{};0;매도전".format(code, volume)
+                    order = "매도;{};시장가;{};0;매도전\n".format(code, volume)
                     codeList.append(order)
                     self.kiwoom.setRealRemove("0156", code)
                     # self.todayBuyList.remove(code)
