@@ -178,9 +178,9 @@ class Kiwoom(QAxWidget):
         self.inquiry = inquiry
 
         if requestName == "관심종목정보요청":
-            data = self.getCommDataEx(trCode, "관심종목정보")
-            print(type(data))
-            print(data)
+            self.data = self.getCommDataEx(trCode, "관심종목정보")
+            print(type(self.data))
+            print(self.data)
 
             """ getCommData
             cnt = self.getRepeatCnt(trCode, requestName)
@@ -191,16 +191,10 @@ class Kiwoom(QAxWidget):
             """
 
         elif requestName == "주식틱차트조회요청":
-            # OPT10079.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
             self.data = self.getCommDataEx(trCode, "주식틱차트조회")
-            # colName = ['현재가', '거래량', '체결시간', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-            # self.data = DataFrame(data, columns=colName)
 
         elif requestName == "주식일봉차트조회요청":
-            # OPT10081.receiveTrData(self, screenNo, requestName, trCode, recordName, inquiry,deprecated1, deprecated2, deprecated3, deprecated4)
             self.data = self.getCommDataEx(trCode, "주식일봉차트조회")
-            #colName = ['종목코드', '현재가', '거래량', '거래대금', '일자', '시가', '고가', '저가', '수정주가구분', '수정비율', '대업종구분', '소업종구분', '종목정보', '수정주가이벤트', '전일종가']
-            #self.data = DataFrame(data, columns=colName)
 
         elif requestName == "예수금상세현황요청":
             deposit = self.getCommData(trCode, requestName, 0, "d+2추정예수금")
@@ -208,7 +202,6 @@ class Kiwoom(QAxWidget):
             self.opw00001Data = deposit
 
         elif requestName == "계좌평가잔고내역요청":
-            # OPW00018.receiveTrData(screenNo, requestName, trCode, recordName, inquiry, deprecated1, deprecated2, deprecated3, deprecated4)
             # 계좌 평가 정보
             accountEvaluation = []
             keyList = ["총매입금액", "총평가금액", "총평가손익금액", "총수익률(%)", "추정예탁자산"]
@@ -521,7 +514,11 @@ class Kiwoom(QAxWidget):
                                       screenNo)
 
         if returnCode != ReturnCode.OP_ERR_NONE:
-            raise KiwoomProcessingError("commRqData(): " + ReturnCode.CAUSE[returnCode])
+            if returnCode == ReturnCode.OP_ERR_SISE_OVERFLOW:
+                self.disconnect()
+                self.commConnect()
+            else:
+                raise KiwoomProcessingError("commRqData(): " + ReturnCode.CAUSE[returnCode])
 
         # 루프 생성: receiveTrData() 메서드에서 루프를 종료시킨다.
         self.requestLoop = QEventLoop()
@@ -691,7 +688,7 @@ class Kiwoom(QAxWidget):
         :return: string - fid에 해당하는 데이터
         """
         self.log.info("[getCommRealData]")
-        self.log.debug("code, fid : ({}, {})".format(tcode, fid))
+        self.log.debug("code, fid : ({}, {})".format(code, fid))
 
         if not (isinstance(code, str)
                 and isinstance(fid, int)):
@@ -963,7 +960,7 @@ class Kiwoom(QAxWidget):
 
         cmd = 'GetCodeListByMarket("{}")'.format(market)
         codeList = self.dynamicCall(cmd)
-        return codeList.split(';')
+        return codeList[:-1].split(';')
 
     def getCodeList(self, *market):
         """

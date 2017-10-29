@@ -38,38 +38,38 @@
 
 CREATE TABLE `opt10081` (
   `symbol` varchar(6) NOT NULL,
-  `close` int(11) NOT NULL,
+  `cur_price` int(11) NOT NULL,
   `volume` int(11) NOT NULL,
   `volume_price` int(11) NOT NULL,
   `date` datetime NOT NULL,
-  `open` int(11) NOT NULL,
-  `high` int(11) NOT NULL,
-  `low` int(11) NOT NULL,
+  `open_price` int(11) NOT NULL,
+  `high_price` int(11) NOT NULL,
+  `low_price` int(11) NOT NULL,
   `modify_gubun` varchar(40) DEFAULT NULL,
   `modify_ratio` varchar(40) DEFAULT NULL,
   `big_gubun` varchar(40) DEFAULT NULL,
   `small_gubun` varchar(40) DEFAULT NULL,
-  `symbol_inform` varchar(40) DEFAULT NULL,
+  `stock_inform` varchar(40) DEFAULT NULL,
   `modify_event` varchar(40) DEFAULT NULL,
   `before_close` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`symbol`,`date`)
+  PRIMARY KEY (`code`,`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
 CREATE TABLE `opt10079` (
-  `symbol` varchar(40) NOT NULL,
-  `close` varchar(40) DEFAULT NULL,
+  `code` varchar(40) NOT NULL,
+  `cur_price` varchar(40) DEFAULT NULL,
   `volume` varchar(40) DEFAULT NULL,
   `volume_price` varchar(40) DEFAULT NULL,
   `date` varchar(40) NOT NULL,
-  `open` varchar(40) DEFAULT NULL,
-  `high` varchar(40) DEFAULT NULL,
-  `low` varchar(40) DEFAULT NULL,
+  `open_price` varchar(40) DEFAULT NULL,
+  `high_price` varchar(40) DEFAULT NULL,
+  `low_price` varchar(40) DEFAULT NULL,
   `modify_gubun` varchar(40) DEFAULT NULL,
   `modify_ratio` varchar(40) DEFAULT NULL,
   `big_gubun` varchar(40) DEFAULT NULL,
   `small_gubun` varchar(40) DEFAULT NULL,
-  `symbol_inform` varchar(40) DEFAULT NULL,
+  `stock_inform` varchar(40) DEFAULT NULL,
   `modify_event` varchar(40) DEFAULT NULL,
   `before_close` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`symbol`,`date`)
+  PRIMARY KEY (`code`,`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;

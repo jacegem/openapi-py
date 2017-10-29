@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidget
 from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5 import uic
 from Kiwoom import Kiwoom, ParameterTypeError, ParameterValueError, KiwoomProcessingError, KiwoomConnectError
+from Kiwoom_sungwon import *
 
 ui = uic.loadUiType("pytrader.ui")[0]
 
@@ -19,7 +20,7 @@ class MyWindow(QMainWindow, ui):
         self.setupUi(self)
         self.show()
 
-        self.kiwoom = Kiwoom()
+        self.kiwoom = Kiwoom_sungwon()
         self.kiwoom.commConnect()
         #self.kiwoom.log.setLevel('INFO')
         self.kiwoom.log.info("# MyWindow Init Start")
@@ -200,8 +201,8 @@ class MyWindow(QMainWindow, ui):
         self.stocksTable.resizeRowsToContents()
 
         # stock list
-        for (_, symbol, volume, _, _, _, profit_ratio) in self.kiwoom.opw00018Data['stocks']: # keyList = ["종목명", "종목번호", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
-            self.stockList[symbol] = (profit_ratio, volume)
+        for (_, code, volume, _, _, _, profit_ratio) in self.kiwoom.opw00018Data['stocks']: # keyList = ["종목명", "종목번호", "보유수량", "매입가", "현재가", "평가손익", "수익률(%)"]
+            self.stockList[code] = (profit_ratio, volume)
 
         # 데이터 초기화
         self.kiwoom.opwDataReset()
@@ -405,9 +406,9 @@ class MyWindow(QMainWindow, ui):
             self.kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 0, "0615")
             for cnt in self.kiwoom.data:
                 print("""replace into opt10081
-                          (symbol, close, volume, volume_price, date,
-                          open, high, low, modify_gubun, modify_ratio,
-                          big_gubun, small_gubun, symbol_inform, modify_event, before_close) values
+                          (code, cur_price, volume, volume_price, date,
+                          open_price, high_price, low_price, modify_gubun, modify_ratio,
+                          big_gubun, small_gubun, code_inform, modify_event, before_close) values
                               ({}, {}, {}, {}, {},
                                {}, {}, {}, {}, {},
                                {}, {}, {}, {}, {})
@@ -422,9 +423,9 @@ class MyWindow(QMainWindow, ui):
                 self.kiwoom.commRqData("주식일봉차트조회요청", "OPT10081", 2, "0615")
                 for cnt in self.kiwoom.data:
                     print("""replace into opt10081
-                              (symbol, close, volume, volume_price, date,
-                              open, high, low, modify_gubun, modify_ratio,
-                              big_gubun, small_gubun, symbol_inform, modify_event, before_close) values
+                              (code, cur_price, volume, volume_price, date,
+                              open_price, high_price, low_price, modify_gubun, modify_ratio,
+                              big_gubun, small_gubun, code_inform, modify_event, before_close) values
                                   ({}, {}, {}, {}, {},
                                    {}, {}, {}, {}, {},
                                    {}, {}, {}, {}, {})
