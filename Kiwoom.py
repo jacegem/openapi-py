@@ -514,11 +514,7 @@ class Kiwoom(QAxWidget):
                                       screenNo)
 
         if returnCode != ReturnCode.OP_ERR_NONE:
-            if returnCode == ReturnCode.OP_ERR_SISE_OVERFLOW:
-                self.disconnect()
-                self.commConnect()
-            else:
-                raise KiwoomProcessingError("commRqData(): " + ReturnCode.CAUSE[returnCode])
+            raise KiwoomProcessingError("commRqData(): " + ReturnCode.CAUSE[returnCode])
 
         # 루프 생성: receiveTrData() 메서드에서 루프를 종료시킨다.
         self.requestLoop = QEventLoop()
